@@ -2,5 +2,4 @@ Project-Digital-Communications
 ==============================
 
 First work with Git
-
-Quadrature Amplitude Modulation Demonstation using Matlab
+Experimenting with GitQuadrature Amplitude Modulation Demonstation using Matlab
