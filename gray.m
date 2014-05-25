@@ -2,8 +2,15 @@ function r = gray(num)
     
 
 
-r=bitxor(bitshift(nb,1),nb);
+o=bitxor(bitshift(num,1),num);
 
 % return (num >> 1) ^ num;
+i=0;
+while 2^i < num
+    i=i+1;
+end
 
+r=bitand(o, 3);
+i
+num
 end 
