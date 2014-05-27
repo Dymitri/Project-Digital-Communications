@@ -10,8 +10,12 @@ tmpvec = invec*(2.^(size(invec,2)-1:-1:0))';
 
 
 for i = 1:length(tmpvec)
-    if tmpvec(i)==map(i);
-        ok=map(i,:,:);
+    for j = 1:length(map)
+        if tmpvec(i)==map(j);
+        ok(i, :)=map(j, :);
+    end
+
 end
 end
+outvec=ok;
 end
