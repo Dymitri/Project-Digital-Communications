@@ -18,12 +18,20 @@ stream=RandBitStream(n);
 
 
 % Modulator
+
+%mapping
 [ map, complex_constell ]=gray(M); %constellation
 scatterplot(complex_constell);
 
 grouped_bits=bitgrp(stream, M);
 symbols=binary2dec(grouped_bits);
 mapped=map2gray(symbols, map);
+
+%splitting
+
+[I, Q]=split_stream(mapped);
+
+
 
 %now we have to map symbols to points in map.
 %map2gray function is not finished yet
