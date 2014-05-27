@@ -17,8 +17,8 @@ dataIn = randi([0 1],n,1);  % Generate vector of binary data
 
 % changing bits to ints, needed for toolbox qam function
 
-%dataInMatrix = reshape(dataIn, length(dataIn)/4, 4); % Reshape data into binary 4-tuples
-%dataSymbolsIn = bi2de(dataInMatrix);                 % Convert to integers
+dataInMatrix = reshape(dataIn, length(dataIn)/4, 4); % Reshape data into binary 4-tuples
+dataSymbolsIn = bi2de(dataInMatrix);                 % Convert to integers
 
 % ploting ints
 

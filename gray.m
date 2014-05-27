@@ -1,4 +1,4 @@
-function [map] = gray(M)
+function [map mod] = gray(M)
 
 k = log2(M); % number of bits in each constellation
 
@@ -14,7 +14,7 @@ ipDecRe = bin2dec(ipBin(:,[1:k/2]));
 ipGrayDecRe = bitxor(ipDecRe,floor(ipDecRe/2));
 % taking b2b3 for imaginary
 ipDecIm = bin2dec(ipBin(:,[k/2+1:k]));
-ipGrayDecIm = bitxor(ipDecIm,floor(ipDecIm/2))
+ipGrayDecIm = bitxor(ipDecIm,floor(ipDecIm/2));
 % mapping the Gray coded symbols into constellation
 modRe = alphaRe(ipGrayDecRe+1);
 modIm = alphaIm(ipGrayDecIm+1);

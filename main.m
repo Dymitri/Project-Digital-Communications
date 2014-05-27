@@ -18,8 +18,8 @@ stream=RandBitStream(n);
 
 
 % Modulator
-map=gray(M); %constellation
-
+[ map, complex_constell ]=gray(M); %constellation
+scatterplot(complex_constell);
 
 grouped_bits=bitgrp(stream, M);
 symbols=binary2dec(grouped_bits);
