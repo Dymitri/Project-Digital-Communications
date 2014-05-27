@@ -48,6 +48,8 @@ ytx = rcosflt(mapped,1,nsamp,'filter',rrcfilter);
 fig=scatterplot(complex_constell);
 hold on;
 pause;
+scatterplot(mapped(:,2:3), 1, 0,'rx',fig);
+pause;
 scatterplot(ytx(:,2:3), 1, 0,'g.',fig);
 
 
