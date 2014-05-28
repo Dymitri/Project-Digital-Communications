@@ -78,10 +78,10 @@ function pushbutton1_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+stream = RandBitStream(100);
 
 axes(handles.axes1);
-plot(handles.axes1,sin(0:0.1:10));
+stem(stream);
 
 % --- Executes on button press in pushbutton2.
 function pushbutton2_Callback(hObject, eventdata, handles)
