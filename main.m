@@ -38,7 +38,7 @@ mapped=map2gray(symbols, map);
 fig=scatterplot(complex_constell);
 hold on;
 pause;
-scatterplot(mapped(:,2:3), 1, 0,'rx',fig);
+scatterplot(mapped(:,2:3), 1, 0,'ro',fig);
 pause;
 
 
@@ -50,5 +50,11 @@ receivedSignal = awgn(mapped(:,2:3), snr, 'measured'); %% to be replaced
 
 
 scatterplot(receivedSignal, 1, 0, 'g.', fig);
+
+recovered_constellation=rec_constell(receivedSignal);
+
+scatterplot((2.*round((recovered_constellation+1)/2)-1), 1, 0, 'ko', fig);
+
+
 
 
