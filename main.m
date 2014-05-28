@@ -55,6 +55,7 @@ recovered_constellation=rec_constell(receivedSignal);
 
 scatterplot((2.*round((recovered_constellation+1)/2)-1), 1, 0, 'ko', fig);
 
+recovered_symbols=gray2symbols(recovered_constellation, map);
 
 
 
