@@ -88,10 +88,18 @@ function pushbutton2_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton2 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA
+%mapping
+[ map, complex_constell ]=gray(M); %constellation
 
+
+grouped_bits=bitgrp(stream, M);
+symbols=binary2dec(grouped_bits);
+mapped=map2gray(symbols, map);
 
 axes(handles.axes2);
-plot(cos(0:0.1:10));
+fig=scatterplot(complex_constell);
+hold on;
+
 
 % --- Executes on button press in pushbutton3.
 function pushbutton3_Callback(hObject, eventdata, handles)
