@@ -97,8 +97,8 @@ symbols=binary2dec(grouped_bits);
 mapped=map2gray(symbols, map);
 
 axes(handles.axes2);
-fig=scatterplot(complex_constell);
-hold on;
+scatterplot(complex_constell);
+
 
 
 % --- Executes on button press in pushbutton3.
