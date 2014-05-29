@@ -78,7 +78,7 @@ function pushbutton1_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-stream = RandBitStream(10);
+stream = RandBitStream(100);
 
 axes(handles.axes1);
 stem(stream);
@@ -91,8 +91,7 @@ function pushbutton2_Callback(hObject, eventdata, handles)
 %mapping
 M = 16;
 [ map, complex_constell ]=gray(M); %constellation
-stream = RandBitStream(10);
-clc; clear all;
+stream = RandBitStream(100);
 grouped_bits=bitgrp(stream, M);
 symbols=binary2dec(grouped_bits);
 mapped=map2gray(symbols, map);
