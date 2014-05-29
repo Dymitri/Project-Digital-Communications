@@ -46,7 +46,7 @@ receivedSignal = awgn(dataMod, snr, 'measured');
 
 sPlotFig = scatterplot(receivedSignal, 1, 0, 'g.');
 hold on
-scatterplot(dataMod, 1, 0, 'k*', sPlotFig)
+scatterplot(dataMod, 1, 0, 'k*', sPlotFig);
 
 %demodulating using one function
 
