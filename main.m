@@ -2,7 +2,7 @@
  clc; clear; close all;
 
  M = 16;
- n = 100; % number of bits in bitstream
+ n = 1000; % number of bits in bitstream
  k=log2(M)
  
 % rolloff = 0.5;
@@ -56,6 +56,6 @@ recovered_constellation=rec_constell(receivedSignal);
 scatterplot((2.*round((recovered_constellation+1)/2)-1), 1, 0, 'ko', fig);
 
 recovered_symbols=gray2symbols(recovered_constellation, map);
+recovered_bits=symbols2bits(recovered_symbols);
 
-
-
+[bit_errors, ber]=ber_calc(recovered_bits, stream);
