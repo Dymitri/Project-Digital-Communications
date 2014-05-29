@@ -95,9 +95,9 @@ stream = RandBitStream(100);
 grouped_bits=bitgrp(stream, M);
 symbols=binary2dec(grouped_bits);
 mapped=map2gray(symbols, map);
-
 axes(handles.axes2);
-scatterplot(complex_constell);
+handles.axes2 = scatterplot(complex_constell);
+
 
 
 
