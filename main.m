@@ -35,7 +35,9 @@ mapped=map2gray(symbols, map);
 
 
 
-fig=plot(real(complex_constell),imag(complex_constell),'b.');
+%fig=plot(real(complex_constell),imag(complex_constell),'b.');
+
+fig = scatterplot(complex_constell);
 hold on;
 pause;
 scatterplot(mapped(:,2:3), 1, 0,'ro',fig);
