@@ -38,7 +38,7 @@ mapped=map2gray(symbols, map);
 fig=plot(real(complex_constell),imag(complex_constell),'b.');
 hold on;
 pause;
-scatterplot(mapped(:,2:3), 1, 0,'ro')%,fig);
+scatterplot(mapped(:,2:3), 1, 0,'ro',fig);
 pause;
 
 % 
@@ -52,7 +52,7 @@ constant=std(mapped(:,2:3))/(std(noise)*10^(snr/20));
 receivedSignal=mapped(:,2:3) + noise*constant; %output of transmitter
 noise1=noise*constant;
 
-scatterplot(receivedSignal, 1, 0, 'g.')%, fig);
+scatterplot(receivedSignal, 1, 0, 'g.', fig);
 
 recovered_constellation=rec_constell(receivedSignal, map);
 
