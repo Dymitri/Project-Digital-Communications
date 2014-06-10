@@ -5,9 +5,9 @@ function [ YY, ff ] = fft_ok( signal, fs )
 dt=1/fs;
 N=length(signal);
 df = 1/(N*dt);
-ff = df * (0 : N/2);
+ff = df * (0 : N/2-1);
 Y=fft(signal)/N;
-YY=Y(1:((N+1)/2));
+YY=Y(1:(N/2));
 
 
 end
