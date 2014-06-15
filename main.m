@@ -1,9 +1,9 @@
 
  clc; clear; close all;
 
- M = 16;
- n = 1000; % number of bits in bitstream
- k=log2(M);
+ M = 256; % order of the modulation
+ n = 10000; % number of bits in bitstream
+ k=log2(M); % size of one symbol?
  
 % rolloff = 0.5;
 % snr = 20;
@@ -30,7 +30,7 @@ mapped=map2gray(symbols, map);
 
 %splitting
 
-%[I, Q]=split_stream(mapped);
+[I, Q]=split_stream(mapped);
 
 
 
@@ -65,6 +65,14 @@ recovered_bits=symbols2bits(recovered_symbols);
 
 [bit_errors, ber]=ber_calc(recovered_bits, stream);
 
+
+
+%theoretical ber, some approximations taken // wiki
+x=sqrt(3*k*EbNo/(M-1));
+theoretical_ber=(4/k)*(1-1/sqrt(M))*(1/2)*erfc(x/sqrt(2));
+
+
 bit_errors
 ber
+theoretical_ber
 length(recovered_bits)
