@@ -1,15 +1,17 @@
 
  clc; clear; close all;
 
+  M = 16;
+ n = 1000; % number of bits in bitstream
+ k=log2(M);
  M = 16; % order of the modulation
  n = 20; % number of bits in bitstream
  k=log2(M); % size of one symbol?
  EbNo = 10; % to calculate snr
  f=10; %frequency of the carrier
  T=0.1; %symbol time ?
- fsym=1/T; %freq of symbols;
- 
- % rolloff = 0.5;
+ fsym=1/T; %freq of symbols;% rolloff = 0.5;
+% rolloff = 0.5;
 % snr = 20;
 % kanal = 2;
 % BR = 64000;
