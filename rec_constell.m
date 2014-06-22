@@ -1,6 +1,6 @@
 function [ inv_map ] = rec_constell( received, map )
-%UNTITLED2 Summary of this function goes here
-%   Detailed explanation goes here
+% recoveres constellation 
+% each received symbol is rounded to match the closest constellation point
 
 tmp_map=2.*round((received+1)/2)-1;
 maxm=max(map(:,2));

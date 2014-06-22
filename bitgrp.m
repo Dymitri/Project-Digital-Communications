@@ -1,4 +1,7 @@
 function symb = bitgrp(bitstr, m)
+% returns array of a grouped bits of lengrh depending on the modulation
+% order m used
+
 len=length(bitstr);
 bitspersymbol=log2(m);
 i=1;

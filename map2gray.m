@@ -1,13 +1,8 @@
 function [ outvec ] = map2gray( invec, map )
-%UNTITLED2 Summary of this function goes here
-%   Detailed explanation goes here
+%maps vector of symbols to the array outvec containing symbol, I , Q
+%according to delivered map arrays
 
 tmpvec = invec*(2.^(size(invec,2)-1:-1:0))';
-%while tmpvec(i)~=map(i)
-%    i=i+1;
-%    outvec=map(i,:,:);
-%end
-
 
 for i = 1:length(tmpvec)
     for j = 1:length(map)

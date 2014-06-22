@@ -1,6 +1,10 @@
 function [ YY, ff ] = fft_ok( signal, fs )
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
+%calculates frequency spectrum of the given signal
+%
+%signal -  input signal in time domain
+%fs - sampling frequency
+%YY - amplitude of the output signal
+%ff - values of the frequency axis
 
 dtt=1/fs;
 N=length(signal);

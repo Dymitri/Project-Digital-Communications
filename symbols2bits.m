@@ -1,11 +1,9 @@
 function [ rec_bitstream ] = symbols2bits( symbols )
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
+% symbols to bits conversion
 
 
 matrix=dec2bin(symbols);
 str=reshape(matrix', [], 1)';
-%rec_bitstream=str2num(str);
 
 for i= 1:length(str)
     

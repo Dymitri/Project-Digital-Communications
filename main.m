@@ -1,4 +1,18 @@
- clc; clear; close all;
+%               QAM demo
+%Authors:
+%    Przemys³aw Dymitrowski
+%    Piotr Szkotak
+%    Electronics and Telecommunications III year
+%    06.2014
+%
+%   To use it adjust parameters below or use dedicated Graphical User
+%   Interface by executing gui.m file
+%
+%
+%
+
+
+clc; clear; close all;
 
   
  M = 16; % order of the modulation
@@ -14,7 +28,7 @@ fn=fs/2;            % Nyquist frequency [Hz]
 Ts=1/fs;	        % Sampling time [s]
 t=[0:Ts:(n*Tb)-Ts]';% Time vector initialization
  
- stream=RandBitStream(n); %generating random bitstream
+stream=RandBitStream(n); %generating random bitstream
 
 
 % Modulator
@@ -42,7 +56,7 @@ for i=1:len
         sQ(x(i*rep:(i+1)*rep))=Q(i);
     end
 end
-sI=sI(rep:end-1);
+sI=sI(rep:end-1); %modulating signals
 sQ=sQ(rep:end-1);
 
 
@@ -76,7 +90,6 @@ snr = EbNo + 10*log10(k);
 noise=randn(size(output_signal)); % random noise generation
 constant=std(output_signal)/(std(noise)*10^(snr/20));
 received_signal=output_signal + noise*constant; %output of transmitter
-noise1=noise*constant; % ????? WTF?
 
 
 %demodulation
@@ -139,7 +152,7 @@ plot(t, filtered_Q, 'r'); title('Recovered Q'); xlabel('t[s]'); ylabel('A'); pau
 %real ber
 [bit_errors, ber]=ber_calc(recovered_bits, stream);
 
-%theoretical ber, some approximations taken // wiki
+%theoretical ber
 x=sqrt(3*k*EbNo/(M-1));
 theoretical_ber=(4/k)*(1-1/sqrt(M))*(1/2)*erfc(x/sqrt(2));
 

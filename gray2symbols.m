@@ -1,7 +1,5 @@
 function [ outvec ] = gray2symbols( invec, map )
-%UNTITLED3 Summary of this function goes here
-%   Detailed explanation goes here
-
+% mapping I, Q pairs to decimal values
 
 
 for i = 1:length(invec)

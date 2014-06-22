@@ -1,4 +1,6 @@
 function [map mod] = gray(M)
+% returns map of gray coded points in a form: decimal value, I, Q
+% and mod in a complex form: I+jQ
 
 k = log2(M); % number of bits in each constellation
 

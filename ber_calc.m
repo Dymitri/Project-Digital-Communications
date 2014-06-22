@@ -1,6 +1,8 @@
 function [ n, ber ] = ber_calc( received, sent )
-%UNTITLED2 Summary of this function goes here
-%   Detailed explanation goes here
+%compares generated bitstream and received one
+%
+%n - number of flipped bits
+%ber - bit error rate
 n=0;
 for i=1:length(received)
     if received(i)~=sent(i)
