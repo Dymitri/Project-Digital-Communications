@@ -4,6 +4,15 @@ function symb = bitgrp(bitstr, m)
 
 len=length(bitstr);
 bitspersymbol=log2(m);
+
+%in case of wrong bitstream length
+%zero padding
+while mod(len/bitspersymbol,1) ~= 0
+    pads=ceil(len/bitspersymbol)-len;
+    bitstr=padarray(bitstr,[0 pads], 'post');
+end
+    
+    
 i=1;
 j=1;
 k=1;

@@ -16,16 +16,16 @@ clc; clear; close all;
 
   
  M = 16; % order of the modulation
- n = 16; % number of bits in bitstream
+ n = 8; % number of bits in bitstream
  k=log2(M); % bits per symbol
  EbNo = 20; % to calculate snr
  fc=40; %frequency of the carrier
  Tb=1/n;		        % Bit duration time [s]
  
-
-fs=500;     	    % sampling frequency [Hz]
-fn=fs/2;            % Nyquist frequency [Hz]
-Ts=1/fs;	        % Sampling time [s]
+fs = 500;          %desired sampling frequency
+frs=n*round(fs/n); % real sampling frequency [Hz]
+fn=frs/2;           % Nyquist frequency [Hz]
+Ts=1/frs;	        % Sampling time [s]
 t=[0:Ts:(n*Tb)-Ts]';% Time vector initialization
  
 stream=RandBitStream(n); %generating random bitstream
@@ -47,17 +47,15 @@ mapped=map2gray(symbols, map); %mapping symbols to the constellation points
 % creating modulating signals sI and sQ
 
 len=n/k; %length of I or Q in symbols
-rep=fs/len; %number of repetitions of a single bit (to obtain square wave)
+rep=frs/len; %number of repetitions of a single bit (to obtain square wave)
 
-x=1:1:(len+1)*(1/Ts*k);
+
 for i=1:len
-    for j=1:.1:i+1;
-        sI(x(i*rep:(i+1)*rep))=I(i);
-        sQ(x(i*rep:(i+1)*rep))=Q(i);
-    end
+        sI(i*rep:(i+1)*rep)=I(i);
+        sQ(i*rep:(i+1)*rep)=Q(i);
 end
-sI=sI(rep:end-1); %modulating signals
-sQ=sQ(rep:end-1);
+sI=sI(end-frs:end-1); %modulating signals
+sQ=sQ(end-frs:end-1);
 
 
 
@@ -100,8 +98,8 @@ Q_recovered=received_signal.*carrier_Q;
 
 %filtration
 
-filtered_I=lpf(I_recovered, fc, fs);
-filtered_Q=lpf(Q_recovered, fc, fs);
+filtered_I=lpf(I_recovered, fc, frs);
+filtered_Q=lpf(Q_recovered, fc, frs);
 
 
 filtered_I=2*filtered_I;
@@ -109,9 +107,9 @@ filtered_Q=2*filtered_Q;
 
 %averaging
 
-sym_num=n/k;
-demodulated_I=mean(reshape(filtered_I, fs/sym_num, []))';
-demodulated_Q=mean(reshape(filtered_Q, fs/sym_num, []))';
+
+demodulated_I=mean(reshape(filtered_I, ceil(frs/len), []))';
+demodulated_Q=mean(reshape(filtered_Q, ceil(frs/len), []))';
 receivedSignal=horzcat(demodulated_I, demodulated_Q)
 mappedSignal=mapped(:,2:3) %just to display and compare with receivedSignal
 
@@ -130,10 +128,10 @@ recovered_bits=symbols2bits(recovered_symbols);
 
 %plots in frequency most importatnt blue and red!
 hold on;
-plot_fft(sI, fs, 'b', 'Spectrum of modulating signal sI'); pause
-plot_fft(modulated_I, fs, 'g', 'Spectrum of modulated signal (sI*carrier)'); pause
-plot_fft(I_recovered, fs, 'y', 'Spectrum of modulated signal after multiplication by carrier at the receiver'); pause
-plot_fft(2*filtered_I, fs, 'r', 'Spectrum of demodulated signal after LPF and amplitude compensation'); pause
+plot_fft(sI, frs, 'b', 'Spectrum of modulating signal sI'); pause
+plot_fft(modulated_I, frs, 'g', 'Spectrum of modulated signal (sI*carrier)'); pause
+plot_fft(I_recovered, frs, 'y', 'Spectrum of modulated signal after multiplication by carrier at the receiver'); pause
+plot_fft(2*filtered_I, frs, 'r', 'Spectrum of demodulated signal after LPF and amplitude compensation'); pause
 hold off;
 
 %plots time
