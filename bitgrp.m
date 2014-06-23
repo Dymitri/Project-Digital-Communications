@@ -3,13 +3,21 @@ function symb = bitgrp(bitstr, m)
 % order m used
 
 len=length(bitstr);
-bitspersymbol=log2(m);
+bitspersymbol=log2(m)
 
 %in case of wrong bitstream length
 %zero padding
-while mod(len/bitspersymbol,1) ~= 0
-    pads=ceil(len/bitspersymbol)-len;
-    bitstr=padarray(bitstr,[0 pads], 'post');
+num_sym=len/bitspersymbol;
+while mod(len,bitspersymbol) ~= 0
+    pads=bitspersymbol*ceil(num_sym)- len
+    if len<=bitspersymbol
+        pads=pads+bitspersymbol;
+    end
+    bitstr=padarray(bitstr,[0 pads], 'post')
+    len=length(bitstr)
+    num_sym=len/bitspersymbol
+    modd=mod(num_sym,bitspersymbol) 
+    pause
 end
     
     

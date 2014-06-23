@@ -16,19 +16,16 @@ clc; clear; close all;
 
   
  M = 16; % order of the modulation
- n = 8; % number of bits in bitstream
+ n = 7; % number of bits in bitstream
  k=log2(M); % bits per symbol
  EbNo = 20; % to calculate snr
  fc=40; %frequency of the carrier
- Tb=1/n;		        % Bit duration time [s]
- 
+
 fs = 500;          %desired sampling frequency
-frs=n*round(fs/n); % real sampling frequency [Hz]
-fn=frs/2;           % Nyquist frequency [Hz]
-Ts=1/frs;	        % Sampling time [s]
-t=[0:Ts:(n*Tb)-Ts]';% Time vector initialization
+
  
 stream=RandBitStream(n); %generating random bitstream
+[stream, nb]=prepare_stream(stream, k); %zero padding if needed
 
 
 % Modulator
@@ -39,6 +36,12 @@ grouped_bits=bitgrp(stream, M); %grouping bits
 symbols=binary2dec(grouped_bits); % creating symbols
 mapped=map2gray(symbols, map); %mapping symbols to the constellation points
 
+
+frs=nb*round(fs/nb); % real sampling frequency [Hz]
+Ts=1/frs;	        % Sampling time [s]
+Tb=1/nb;		        % Bit duration time [s]
+t=[0:Ts:(nb*Tb)-Ts]';% Time vector initialization
+
 %splitting
 [I, Q]=split_stream(mapped);
 
@@ -46,7 +49,7 @@ mapped=map2gray(symbols, map); %mapping symbols to the constellation points
 
 % creating modulating signals sI and sQ
 
-len=n/k; %length of I or Q in symbols
+len=nb/k; %length of I or Q in symbols
 rep=frs/len; %number of repetitions of a single bit (to obtain square wave)
 
 
