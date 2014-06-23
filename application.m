@@ -116,7 +116,8 @@ function bistream_text_Callback(hObject, eventdata, handles)
 %        str2double(get(hObject,'String')) returns contents of bistream_text as a double
 
 
-handles.bitstream_text=get(hObject,'string');
+% handles.bistream_text=get(hObject,'string');
+% %set(handles.bistream_text,'String',stream);
 guidata(hObject, handles);
 
 
@@ -167,18 +168,20 @@ function gen_bits_btn_Callback(hObject, eventdata, handles)
 % hObject    handle to gen_bits_btn (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+global stream
 global N;
 % global stream;
-N=handles.n_text;
+N=handles.n_text;   
+stream = RandBitStream(N);
+% stream1 = num2str(transpose(stream1)); % we convert it to string
+% stream1 = stream1(~isspace(stream1)); % we remove the spaces
+% stream1 = strtrim(stream1);% trim
+% set(handles.bistream_text, 'String', stream1); % we set the string of bitstream to the edit box
+guidata(hObject, handles);
 
-handles.gen_bits_btn = RandBitStream(N);clc;
+% input_bitstream = get(handles.input_bitstream, 'String');
+%  input_string = input_bitstream;
 
-% stream = num2str(transpose(stream)); % we convert it to string
-% stream = stream(~isspace(stream)); % we remove the spaces
-% stream = strtrim(stream); % trim
-% set(handles.bitstream_text, 'String', stream); % we set the string of bitstream to the edit box
-% guidata(hObject, handles);
 
 
 
@@ -191,21 +194,18 @@ function mod_btn_Callback(hObject, eventdata, handles)
 global M;
 global stream;
 global N;
+
+
 N = handles.n_text;
-
 M = handles.m_text;
-
-%stream = handles.gen_bits_btn;
-
-% stream = get(handles.bitstream_text, 'String');
-% stream1 = stream;
-% %stream2 = handles.stream1;
+% stream = handles.gen_bits_btn;
+% stream2 = handles.bistream_text;
 % 
-% % stream1=handles.stream1; %wykres bitstreamu, dla manualnego i generowanego ciagu
 % 
 % for n=1:length(stream2)
 %     stream1(n)=bin2dec(stream2(n));
 % end
+% stream1
 stream = RandBitStream(N);
 axes(handles.input_bit);
 stem(stream);
@@ -217,7 +217,7 @@ Tb=1/N;		        % Bit duration time [s]
  
 
 fs=500;     	    % sampling frequency [Hz]
-frs=n*round(fs/n); % real sampling frequency [Hz]
+frs=N*round(fs/N); % real sampling frequency [Hz]
 fn=frs/2;           % Nyquist frequency [Hz]
 Ts=1/frs;	        % Sampling time [s]
 t=[0:Ts:(N*Tb)-Ts]';% Time vector initialization
@@ -297,13 +297,11 @@ function demod_btn_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 % 
  global M;
-% global stream;
  global N;
-% 
+ 
  M = handles.m_text;
  N = handles.n_text;
-% stream = handles.stream;
-% 
+
 k=log2(M); % bits per symbol
 EbNo = 20; % to calculate snr
 fc=40; %frequency of the carrier
@@ -311,61 +309,14 @@ Tb=1/N;		        % Bit duration time [s]
  
 
 fs=500;     	    % sampling frequency [Hz]
-frs=n*round(fs/n); % real sampling frequency [Hz] 
+frs=N*round(fs/N); % real sampling frequency [Hz] 
 fn=frs/2;           % Nyquist frequency [Hz]
 Ts=1/frs;	        % Sampling time [s]
 t=[0:Ts:(N*Tb)-Ts]';% Time vector initialization
-% 
-% %mapping
-% [ map, complex_constell ]=gray(M); %creating constellation
-% grouped_bits=bitgrp(stream, M); %grouping bits
-% symbols=binary2dec(grouped_bits); % creating symbols
-% mapped=map2gray(symbols, map); %mapping symbols to the constellation points
-% %plotting constellation 
-% axes(handles.const_axes)
-% plot(real(complex_constell),imag(complex_constell),'b.');
-% 
-% 
-% %splitting
-% [I, Q]=split_stream(mapped);
-% 
-% 
-% 
-% % creating modulating signals sI and sQ
-% 
-% len=n/k; %length of I or Q in symbols
-% rep=fs/len; %number of repetitions of a single bit (to obtain square wave)
-% 
-% x=1:1:(len+1)*(1/Ts*k);
-% for i=1:len
-%     for j=1:.1:i+1;
-%         sI(x(i*rep:(i+1)*rep))=I(i);
-%         sQ(x(i*rep:(i+1)*rep))=Q(i);
-%     end
-% end
-% sI=sI(rep:end-1);
-% sQ=sQ(rep:end-1);
-% 
+
 % Carriers
 carrier_I=cos(2*pi*fc*t);
 carrier_Q=-sin(2*pi*fc*t);
-% 
-% % Modulating
-% modulated_I=sI'.*carrier_I;
-% modulated_Q=sQ'.*carrier_Q;
-% 
-% % Summing I and Q
-% output_signal=modulated_I+modulated_Q;
-% 
-% %transmittiing through AWGN
-% 
-% %calculating SNR
-% snr = EbNo + 10*log10(k);
-% 
-% noise=randn(size(output_signal)); % random noise generation
-% constant=std(output_signal)/(std(noise)*10^(snr/20));
-% received_signal=output_signal + noise*constant; %output of transmitter
-
 
 %demodulation
 
