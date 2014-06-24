@@ -160,7 +160,7 @@ plot(t, filtered_Q, 'r'); title('Recovered Q'); xlabel('t[s]'); ylabel('A'); pau
 x=sqrt(3*k*EbNo/(M-1));
 theoretical_ber=(4/k)*(1-1/sqrt(M))*(1/2)*erfc(x/sqrt(2));
 
-[th_ber,th_ber_haykin, pr_ber, bit_errors_vec, snr_values]= ber_data(output_signal, -5 , 50, 1, M, k, carrier_I, carrier_Q, fc, frs, h_lpf, EbNo, snr, len, map, mapped, stream);
+[th_ber,th_ber_haykin, pr_ber, bit_errors_vec, snr_values]= ber_data(output_signal, -5 , 10, 1, M, k, carrier_I, carrier_Q, fc, frs, h_lpf, EbNo, snr, len, map, mapped, stream);
 close all;
 bit_errors
 ber
