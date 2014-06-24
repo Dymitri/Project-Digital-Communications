@@ -16,7 +16,7 @@ clc; clear; close all;
 
   
  M = 256; % order of the modulation
- n = 100; % number of bits in bitstream
+ n = 10000; % number of bits in bitstream
  k=log2(M); % bits per symbol
  EbNo = 20; % SNR per bit
  fc=4*n; %frequency of the carrier
