@@ -17,8 +17,7 @@ while mod(len,bitspersymbol) ~= 0
     len=length(bitstr)
     num_sym=len/bitspersymbol
     modd=mod(num_sym,bitspersymbol) 
-    pause
-end
+   end
     
     
 i=1;

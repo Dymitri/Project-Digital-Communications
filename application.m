@@ -206,21 +206,31 @@ M = handles.m_text;
 %     stream1(n)=bin2dec(stream2(n));
 % end
 % stream1
-stream = RandBitStream(N);
+
+k=log2(M); % bits per symbol
+setappdata(0,'stream',RandBitStream(N));
+[stream, nb]=prepare_stream(getappdata(0,'stream'), k); %zero padding if needed
 axes(handles.input_bit);
 stem(stream);
 
-k=log2(M); % bits per symbol
+
 EbNo = 20; % to calculate snr
 fc=40; %frequency of the carrier
-Tb=1/N;		        % Bit duration time [s]
  
+% 
+ fs=500;     	    % sampling frequency [Hz]
+% frs=N*round(fs/N); % real sampling frequency [Hz]
+% fn=frs/2;           % Nyquist frequency [Hz]
+% Ts=1/frs;	        % Sampling time [s]
+% t=[0:Ts:(N*Tb)-Ts]';% Time vector initialization
 
-fs=500;     	    % sampling frequency [Hz]
-frs=N*round(fs/N); % real sampling frequency [Hz]
-fn=frs/2;           % Nyquist frequency [Hz]
+
+frs=nb*round(fs/nb); % real sampling frequency [Hz]
 Ts=1/frs;	        % Sampling time [s]
-t=[0:Ts:(N*Tb)-Ts]';% Time vector initialization
+Tb=1/nb;		        % Bit duration time [s]
+t=[0:Ts:(nb*Tb)-Ts]';% Time vector initialization
+
+
 
 %mapping
 [ map, complex_constell ]=gray(M); %creating constellation
@@ -239,7 +249,7 @@ plot(real(complex_constell),imag(complex_constell),'b.');
 
 % creating modulating signals sI and sQ
 
-len=N/k; %length of I or Q in symbols
+len=nb/k; %length of I or Q in symbols
 rep=frs/len; %number of repetitions of a single bit (to obtain square wave)
 
 x=1:1:(len+1)*(1/Ts*k);
@@ -301,18 +311,23 @@ function demod_btn_Callback(hObject, eventdata, handles)
  
  M = handles.m_text;
  N = handles.n_text;
+ k=log2(M); % bits per symbol
+ 
+[stream, nb]=prepare_stream(getappdata(0,'stream'), k); %zero padding if needed
 
-k=log2(M); % bits per symbol
+
 EbNo = 20; % to calculate snr
 fc=40; %frequency of the carrier
-Tb=1/N;		        % Bit duration time [s]
+Tb=1/nb;		        % Bit duration time [s]
  
 
 fs=500;     	    % sampling frequency [Hz]
-frs=N*round(fs/N); % real sampling frequency [Hz] 
-fn=frs/2;           % Nyquist frequency [Hz]
+
+frs=nb*round(fs/nb); % real sampling frequency [Hz]
 Ts=1/frs;	        % Sampling time [s]
-t=[0:Ts:(N*Tb)-Ts]';% Time vector initialization
+Tb=1/nb;		        % Bit duration time [s]
+t=[0:Ts:(nb*Tb)-Ts]';% Time vector initialization
+
 
 % Carriers
 carrier_I=cos(2*pi*fc*t);
@@ -335,7 +350,7 @@ filtered_Q=2*filtered_Q;
 
 %averaging
 
-sym_num=N/k;
+sym_num=nb/k;
 demodulated_I=mean(reshape(filtered_I, ceil(frs/sym_num), []))';
 demodulated_Q=mean(reshape(filtered_Q, ceil(frs/sym_num), []))';
 % received_signal=horzcat(demodulated_I, demodulated_Q)
