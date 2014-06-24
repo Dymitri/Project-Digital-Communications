@@ -15,7 +15,7 @@
 clc; clear; close all;
 
   
- M = 16; % order of the modulation
+ M = 256; % order of the modulation
  n = 100; % number of bits in bitstream
  k=log2(M); % bits per symbol
  EbNo = 20; % SNR per bit

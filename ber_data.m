@@ -1,12 +1,11 @@
-function [ th_ber, th_ber_haykin, pr_ber, snr_val ] = ber_data( output_signal, start_snr, stop_snr, step, M, k, carrier_I, carrier_Q, fc, frs, EbNo, snr, len, map, mapped, stream)
+function [ th_ber, th_ber_haykin, pr_ber, snr_vald ] = ber_data( output_signal, start_snr, stop_snr, step, M, k, carrier_I, carrier_Q, fc, frs, EbNo, snr, len, map, mapped, stream)
 %calculates vectors used to compare theoretial bit error level vs practical
 
-snr_val=start_snr:step:stop_snr;
-snr_val=10.^(snr_val/10);
+snr_vald=start_snr:step:stop_snr
+snr_val=10.^(snr_vald/10)
 
 for i=1:1:length(snr_val)
     
-    snr_val=10.^(snr_val/10);
     received_signal=add_noise(output_signal, snr_val(i));
 
   
@@ -27,8 +26,8 @@ for i=1:1:length(snr_val)
     %averaging
     demodulated_I=mean(reshape(filtered_I, ceil(frs/len), []))';
     demodulated_Q=mean(reshape(filtered_Q, ceil(frs/len), []))';
-    receivedSignal=horzcat(demodulated_I, demodulated_Q)
-    mappedSignal=mapped(:,2:3) %just to display and compare with receivedSignal
+    receivedSignal=horzcat(demodulated_I, demodulated_Q);
+    mappedSignal=mapped(:,2:3); %just to display and compare with receivedSignal
 
 
     %inverse mapping and symbols to bitstream conversion
@@ -43,14 +42,29 @@ for i=1:1:length(snr_val)
 
     %theoretical ber
     %x=sqrt(3*k*EbNo/(M-1));
-    x=sqrt(3*k*snr_val(i)/(M-1));
-    theoretical_ber=(4/k)*(1-1/sqrt(M))*(1/2)*erfc(x/sqrt(2));
-    theoretical_ber_haykin=0.5*(1-(1/sqrt(M)))*erfc(sqrt(snr_val(i)));
+
     
     pr_ber(i)=ber;
-    th_ber(i)=theoretical_ber;
-    th_ber_haykin(i)=theoretical_ber_haykin;
+    %th_ber(i)=theoretical_ber;
+    %th_ber_haykin(i)=theoretical_ber_haykin;
 end
+
+
+%EbNodB=start_snr:step:stop_snr
+%EbNo=10.^(EbNodB/10);
+%k=8;
+%M=2^k;
+x=sqrt(3*k*snr_val/(M-1));
+th_ber=(4/k)*(1-1/sqrt(M))*(1/2)*erfc(x/sqrt(2));
+th_ber_haykin=0.5*(1-(1/sqrt(M)))*erfc(sqrt(snr_val));
+
+hold off;
+%semilogy(snr_vald,Pb)
+%pause;
+
+    %x=sqrt(3*k*snr_val/(M-1));
+    %th_ber=(4/k)*(1-1/sqrt(M))*(1/2)*erfc(x/sqrt(2));
+
 
 end
 
