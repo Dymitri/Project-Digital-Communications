@@ -16,16 +16,21 @@ clc; clear; close all;
 
   
  M = 16; % order of the modulation
- n = 17; % number of bits in bitstream
+ n = 100; % number of bits in bitstream
  k=log2(M); % bits per symbol
- EbNo = 20; % to calculate snr
- fc=40; %frequency of the carrier
-
- fs = 500;          %desired sampling frequency
+ EbNo = 20; % SNR per bit
+ fc=4*n; %frequency of the carrier
+ snr = EbNo + 10*log10(k); %signal to noise ratio
+ fs = 10*fc;          %desired sampling frequency
 
  
 stream=RandBitStream(n); %generating random bitstream
 [stream, nb]=prepare_stream(stream, k); %zero padding if needed
+
+frs=nb*round(fs/nb); % real sampling frequency [Hz]
+Ts=1/frs;	        % Sampling time [s]
+Tb=1/nb;		        % Bit duration time [s]
+t=[0:Ts:(nb*Tb)-Ts]';% Time vector initialization
 
 
 % Modulator
@@ -37,10 +42,6 @@ symbols=binary2dec(grouped_bits); % creating symbols
 mapped=map2gray(symbols, map); %mapping symbols to the constellation points
 
 
-frs=nb*round(fs/nb); % real sampling frequency [Hz]
-Ts=1/frs;	        % Sampling time [s]
-Tb=1/nb;		        % Bit duration time [s]
-t=[0:Ts:(nb*Tb)-Ts]';% Time vector initialization
 
 %splitting
 [I, Q]=split_stream(mapped);
@@ -85,13 +86,11 @@ plot(t, output_signal); title ('Output Signal - sum of modulated I and Q'); ylab
 
 % transmittiing through AWGN
 
-%calculating SNR
-snr = EbNo + 10*log10(k);
 
-noise=randn(size(output_signal)); % random noise generation
-constant=std(output_signal)/(std(noise)*10^(snr/20));
-received_signal=output_signal + noise*constant; %output of transmitter
 
+
+received_signal=add_noise(output_signal, snr);
+%received_signal = awgn(output_signal, snr, 'measured');
 
 %demodulation
 
@@ -157,8 +156,22 @@ plot(t, filtered_Q, 'r'); title('Recovered Q'); xlabel('t[s]'); ylabel('A'); pau
 x=sqrt(3*k*EbNo/(M-1));
 theoretical_ber=(4/k)*(1-1/sqrt(M))*(1/2)*erfc(x/sqrt(2));
 
+[th_ber,th_ber_haykin, pr_ber, snr_values]= ber_data(output_signal, -20 , 20, 1, M, k, carrier_I, carrier_Q, fc, frs, EbNo, snr, len, map, mapped, stream);
 close all;
 bit_errors
 ber
 theoretical_ber
-length(recovered_bits)
+
+
+
+semilogy(snr_values,th_ber,'bo-');
+hold on;
+semilogy(snr_values,th_ber_haykin,'r.-');
+semilogy(snr_values,pr_ber,'mx-');
+%axis([-30 10 10^-5 0.5]) 
+grid on
+legend('theory', 'theory_haykin', 'simulation');
+xlabel('SNR, dB');
+ylabel('Bit Error Rate');
+
+length(recovered_bits) 
