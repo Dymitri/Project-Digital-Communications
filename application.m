@@ -27,7 +27,7 @@ function varargout = application(varargin)
 
 % Edit the above text to modify the response to help application
 
-% Last Modified by GUIDE v2.5 22-Jun-2014 21:47:16
+% Last Modified by GUIDE v2.5 25-Jun-2014 00:50:10
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -80,22 +80,22 @@ varargout{1} = handles.output;
 
 
 function m_text_Callback(hObject, eventdata, handles)
-% hObject    handle to m_text (see GCBO)
+% hObject    handle to text (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of m_text as text
-%        str2double(get(hObject,'String')) returns contents of m_text as a double
+% Hints: get(hObject,'String') returns contents of text as text
+%        str2double(get(hObject,'String')) returns contents of text as a double
 
 
-handles.m_text=str2double(get(hObject,'string'));
+handles.text=str2double(get(hObject,'string'));
 guidata(hObject, handles);
 
 
 
 % --- Executes during object creation, after setting all properties.
 function m_text_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to m_text (see GCBO)
+% hObject    handle to text (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -108,23 +108,23 @@ end
 
 
 function bistream_text_Callback(hObject, eventdata, handles)
-% hObject    handle to bistream_text (see GCBO)
+% hObject    handle to text1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of bistream_text as text
-%        str2double(get(hObject,'String')) returns contents of bistream_text as a double
+% Hints: get(hObject,'String') returns contents of text1 as text
+%        str2double(get(hObject,'String')) returns contents of text1 as a double
 
 
-% handles.bistream_text=get(hObject,'string');
-% %set(handles.bistream_text,'String',stream);
+handles.text1=get(hObject,'string');
+set(handles.text1,'String',stream);
 guidata(hObject, handles);
 
 
 
 % --- Executes during object creation, after setting all properties.
 function bistream_text_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to bistream_text (see GCBO)
+% hObject    handle to text1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -168,19 +168,18 @@ function gen_bits_btn_Callback(hObject, eventdata, handles)
 % hObject    handle to gen_bits_btn (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-global stream
+% global stream
 global N;
 % global stream;
 N=handles.n_text;   
 stream = RandBitStream(N);
-% stream1 = num2str(transpose(stream1)); % we convert it to string
-% stream1 = stream1(~isspace(stream1)); % we remove the spaces
-% stream1 = strtrim(stream1);% trim
-% set(handles.bistream_text, 'String', stream1); % we set the string of bitstream to the edit box
+stream = num2str(transpose(stream)); % we convert it to string
+stream = stream(~isspace(stream))'; % we remove the spaces
+stream = strtrim(stream);% trim
+set(handles.bistream_text,'String',stream); % we set the string of bitstream to the edit box
 guidata(hObject, handles);
 
-% input_bitstream = get(handles.input_bitstream, 'String');
-%  input_string = input_bitstream;
+
 
 
 
@@ -192,24 +191,22 @@ function mod_btn_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 global M;
-global stream;
 global N;
 
 
 N = handles.n_text;
-M = handles.m_text;
-% stream = handles.gen_bits_btn;
-% stream2 = handles.bistream_text;
-% 
-% 
-% for n=1:length(stream2)
-%     stream1(n)=bin2dec(stream2(n));
-% end
-% stream1
+M = handles.text;
+
+bistream_text = get(handles.bistream_text, 'String');
+input_string = bistream_text;
+for n=1:length(input_string)
+stream(n)=bin2dec(input_string(n));
+end
+
 
 k=log2(M); % bits per symbol
-setappdata(0,'stream',RandBitStream(N));
-[stream, nb]=prepare_stream(getappdata(0,'stream'), k); %zero padding if needed
+
+[stream, nb]=prepare_stream(stream, k); %zero padding if needed
 axes(handles.input_bit);
 stem(stream);
 
@@ -309,7 +306,7 @@ function demod_btn_Callback(hObject, eventdata, handles)
  global M;
  global N;
  
- M = handles.m_text;
+ M = handles.text;
  N = handles.n_text;
  k=log2(M); % bits per symbol
  
@@ -375,23 +372,23 @@ demodulated_Q=mean(reshape(filtered_Q, ceil(frs/sym_num), []))';
 axes(handles.fft_axes)
 cla(gca);
 hold on;
-plot_fft(getappdata(0,'sI'), frs, 'b', 'Spectrum of modulating signal sI'); pause;
-plot_fft(getappdata(0,'modulated_I'), frs, 'g', 'Spectrum of modulated signal (sI*carrier)'); pause;
-plot_fft(I_recovered, frs, 'y', 'Spectrum of modulated signal after multiplication by carrier at the receiver'); pause;
-plot_fft(2*filtered_I, frs, 'r', 'Spectrum of demodulated signal after LPF and amplitude compensation'); pause;
+plot_fft(getappdata(0,'sI'), frs, 'b', 'Spectrum of modulating signal sI'); 
+plot_fft(getappdata(0,'modulated_I'), frs, 'g', 'Spectrum of modulated signal (sI*carrier)'); 
+plot_fft(I_recovered, frs, 'y', 'Spectrum of modulated signal after multiplication by carrier at the receiver'); 
+plot_fft(2*filtered_I, frs, 'r', 'Spectrum of demodulated signal after LPF'); 
 hold off;
 
 %plots time
 axes(handles.in_axes);
 cla(gca);hold on;
-plot(t, getappdata(0,'sI'), 'b'); title('Modulating signal I'); xlabel('t[s]'); ylabel('Amplitude'); pause
-plot(t, filtered_I, 'r'); title('Recovered I'); xlabel('t[s]'); ylabel('A'); pause
+plot(t, getappdata(0,'sI'), 'b'); title('Modulating signal I'); xlabel('t[s]'); ylabel('Amplitude');
+plot(t, filtered_I, 'r'); title('Recovered I'); xlabel('t[s]'); ylabel('A');
 hold off;
 
 axes(handles.quad_axes);
 cla(gca); hold on;
-plot(t, getappdata(0,'sQ'), 'b'); title('Modulating signal Q'); xlabel('t[s]'); ylabel('Amplitude'); pause
-plot(t, filtered_Q, 'r'); title('Recovered Q'); xlabel('t[s]'); ylabel('A'); pause
+plot(t, getappdata(0,'sQ'), 'b'); title('Modulating signal Q'); xlabel('t[s]'); ylabel('Amplitude');  
+plot(t, filtered_Q, 'r'); title('Recovered Q'); xlabel('t[s]'); ylabel('A'); 
 hold off;
 
 %real ber
@@ -403,5 +400,5 @@ theoretical_ber=(4/k)*(1-1/sqrt(M))*(1/2)*erfc(x/sqrt(2));
 
 % bit_errors
 % ber
-theoretical_ber
-length(recovered_bits)
+% theoretical_ber
+% length(recovered_bits)
