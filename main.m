@@ -15,19 +15,20 @@
 clc; clear; close all;
 
   
- M = 256; % order of the modulation
- n = 10000; % number of bits in bitstream
+ M = 16; % order of the modulation
+ n = 1000; % number of bits in bitstream
  k=log2(M); % bits per symbol
- EbNo = 20; % SNR per bit
- fc=4*n; %frequency of the carrier
+ EbNo = 10; % SNR per bit
+ fc=2*n; %frequency of the carrier
+ 
  snr = EbNo + 10*log10(k); %signal to noise ratio
  fs = 10*fc;          %desired sampling frequency
-
+ filter_order = 10;
  
 stream=RandBitStream(n); %generating random bitstream
 [stream, nb]=prepare_stream(stream, k); %zero padding if needed
 
-frs=nb*round(fs/nb); % real sampling frequency [Hz]
+frs=nb*ceil(fs/nb); % real sampling frequency [Hz]
 Ts=1/frs;	        % Sampling time [s]
 Tb=1/nb;		        % Bit duration time [s]
 t=[0:Ts:(nb*Tb)-Ts]';% Time vector initialization
@@ -99,9 +100,12 @@ Q_recovered=received_signal.*carrier_Q;
 
 
 %filtration
+h_lpf=lpf(fc, frs, filter_order);
 
-filtered_I=lpf(I_recovered, fc, frs);
-filtered_Q=lpf(Q_recovered, fc, frs);
+filtered_I=filter(h_lpf,I_recovered);
+filtered_Q=filter(h_lpf,Q_recovered);
+
+
 
 
 filtered_I=2*filtered_I;
@@ -156,7 +160,7 @@ plot(t, filtered_Q, 'r'); title('Recovered Q'); xlabel('t[s]'); ylabel('A'); pau
 x=sqrt(3*k*EbNo/(M-1));
 theoretical_ber=(4/k)*(1-1/sqrt(M))*(1/2)*erfc(x/sqrt(2));
 
-[th_ber,th_ber_haykin, pr_ber, snr_values]= ber_data(output_signal, -20 , 20, 1, M, k, carrier_I, carrier_Q, fc, frs, EbNo, snr, len, map, mapped, stream);
+[th_ber,th_ber_haykin, pr_ber, bit_errors_vec, snr_values]= ber_data(output_signal, -5 , 50, 1, M, k, carrier_I, carrier_Q, fc, frs, h_lpf, EbNo, snr, len, map, mapped, stream);
 close all;
 bit_errors
 ber

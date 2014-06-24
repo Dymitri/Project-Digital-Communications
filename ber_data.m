@@ -1,12 +1,12 @@
-function [ th_ber, th_ber_haykin, pr_ber, snr_vald ] = ber_data( output_signal, start_snr, stop_snr, step, M, k, carrier_I, carrier_Q, fc, frs, EbNo, snr, len, map, mapped, stream)
+function [ th_ber, th_ber_haykin, pr_ber, bit_err, snr_vald ] = ber_data( output_signal, start_snr, stop_snr, step, M, k, carrier_I, carrier_Q, fc, frs, h_lpf, EbNo, snr, len, map, mapped, stream)
 %calculates vectors used to compare theoretial bit error level vs practical
 
-snr_vald=start_snr:step:stop_snr
-snr_val=10.^(snr_vald/10)
+snr_vald=start_snr:step:stop_snr;
+snr_val=10.^(snr_vald/10);
 
 for i=1:1:length(snr_val)
     
-    received_signal=add_noise(output_signal, snr_val(i));
+    received_signal=add_noise(output_signal, snr_vald(i));
 
   
 
@@ -16,9 +16,12 @@ for i=1:1:length(snr_val)
 
 
     %filtration
-    filtered_I=lpf(I_recovered, fc, frs);
-    filtered_Q=lpf(Q_recovered, fc, frs);
+    %filtered_I=lpf(I_recovered, fc, frs);
+    %filtered_Q=lpf(Q_recovered, fc, frs);
 
+    
+    filtered_I=filter(h_lpf,I_recovered);
+    filtered_Q=filter(h_lpf,Q_recovered);
 
     filtered_I=2*filtered_I;
     filtered_Q=2*filtered_Q;
@@ -40,30 +43,17 @@ for i=1:1:length(snr_val)
     %real ber
     [bit_errors, ber]=ber_calc(recovered_bits, stream);
 
-    %theoretical ber
-    %x=sqrt(3*k*EbNo/(M-1));
-
-    
+    bit_err(i)=bit_errors;
     pr_ber(i)=ber;
-    %th_ber(i)=theoretical_ber;
-    %th_ber_haykin(i)=theoretical_ber_haykin;
 end
 
 
-%EbNodB=start_snr:step:stop_snr
-%EbNo=10.^(EbNodB/10);
-%k=8;
-%M=2^k;
+
 x=sqrt(3*k*snr_val/(M-1));
 th_ber=(4/k)*(1-1/sqrt(M))*(1/2)*erfc(x/sqrt(2));
 th_ber_haykin=0.5*(1-(1/sqrt(M)))*erfc(sqrt(snr_val));
 
 hold off;
-%semilogy(snr_vald,Pb)
-%pause;
-
-    %x=sqrt(3*k*snr_val/(M-1));
-    %th_ber=(4/k)*(1-1/sqrt(M))*(1/2)*erfc(x/sqrt(2));
 
 
 end
