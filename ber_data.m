@@ -1,4 +1,4 @@
-function [ th_ber, th_ber_haykin, pr_ber, bit_err, snr_vald ] = ber_data( output_signal, start_snr, stop_snr, step, M, k, carrier_I, carrier_Q, fc, frs, h_lpf, EbNo, snr, len, map, mapped, stream)
+function [ th_ber, th_ber_haykin, pr_ber, bit_err, snr_vald ] = ber_data( output_signal, start_snr, stop_snr, step, M, k, carrier_I, carrier_Q, frs, h_lpf, len, map, mapped, stream)
 %calculates vectors used to compare theoretial bit error level vs practical
 
 snr_vald=start_snr:step:stop_snr;
@@ -15,11 +15,7 @@ for i=1:1:length(snr_val)
     Q_recovered=received_signal.*carrier_Q;
 
 
-    %filtration
-    %filtered_I=lpf(I_recovered, fc, frs);
-    %filtered_Q=lpf(Q_recovered, fc, frs);
-
-    
+    %filtration    
     filtered_I=filter(h_lpf,I_recovered);
     filtered_Q=filter(h_lpf,Q_recovered);
 

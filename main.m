@@ -33,7 +33,9 @@ Ts=1/frs;	        % Sampling time [s]
 Tb=1/nb;		        % Bit duration time [s]
 t=[0:Ts:(nb*Tb)-Ts]';% Time vector initialization
 
-
+EbNo_start = -5;
+EbNo_stop = 15;
+EbNo_step = 1;
 % Modulator
 
 %mapping
@@ -159,8 +161,9 @@ plot(t, filtered_Q, 'r'); title('Recovered Q'); xlabel('t[s]'); ylabel('A'); pau
 %theoretical ber
 x=sqrt(3*k*EbNo/(M-1));
 theoretical_ber=(4/k)*(1-1/sqrt(M))*(1/2)*erfc(x/sqrt(2));
-
-[th_ber,th_ber_haykin, pr_ber, bit_errors_vec, snr_values]= ber_data(output_signal, -5 , 10, 1, M, k, carrier_I, carrier_Q, fc, frs, h_lpf, EbNo, snr, len, map, mapped, stream);
+                                                                       
+close all;
+[th_ber,th_ber_haykin, pr_ber, bit_errors_vec, snr_values]= ber_data( output_signal, EbNo_start, EbNo_stop, EbNo_step, M, k, carrier_I, carrier_Q, frs, h_lpf, len, map, mapped, stream);
 close all;
 bit_errors
 ber
@@ -175,7 +178,7 @@ semilogy(snr_values,pr_ber,'mx-');
 %axis([-30 10 10^-5 0.5]) 
 grid on
 legend('theory', 'theory_haykin', 'simulation');
-xlabel('SNR, dB');
+xlabel('EbNo, dB');
 ylabel('Bit Error Rate');
 
 length(recovered_bits) 

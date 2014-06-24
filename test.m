@@ -1,7 +1,5 @@
-EbNodB=-6:2:24
-EbNo=10.^(EbNodB/10);
-k=8;
-M=2^k;
-x=sqrt(3*k*EbNo/(M-1));
-Pb=(4/k)*(1-1/sqrt(M))*(1/2)*erfc(x/sqrt(2));
-semilogy(EbNodB,Pb)
+SNR = 5; frameLen = 100;
+x = rand(100, 1) > 0.5;
+y = awgn(2*x-1, SNR);
+z = y > 0;
+biterr(x, z)
