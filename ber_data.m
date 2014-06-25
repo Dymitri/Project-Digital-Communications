@@ -2,7 +2,8 @@ function [ th_ber, th_ber_haykin, pr_ber, bit_err, snr_vald ] = ber_data( output
 %calculates vectors used to compare theoretial bit error level vs practical
 
 snr_vald=start_snr:step:stop_snr;
-snr_val=10.^(snr_vald/10);
+snr_val=10.^(snr_vald/20);
+snr_val=snr_val./0.6;
 
 for i=1:1:length(snr_val)
     

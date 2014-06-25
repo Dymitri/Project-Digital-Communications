@@ -16,7 +16,7 @@ clc; clear; close all;
 
   
  M = 16; % order of the modulation
- n = 1000; % number of bits in bitstream
+ n = 10000; % number of bits in bitstream
  k=log2(M); % bits per symbol
  EbNo = 10; % SNR per bit
  fc=2*n; %frequency of the carrier
@@ -170,14 +170,13 @@ ber
 theoretical_ber
 
 
-
-semilogy(snr_values,th_ber,'bo-');
-hold on;
 semilogy(snr_values,th_ber_haykin,'r.-');
+%semilogy(snr_values,th_ber,'bo-');
+hold on;
 semilogy(snr_values,pr_ber,'mx-');
 %axis([-30 10 10^-5 0.5]) 
 grid on
-legend('theory', 'theory_haykin', 'simulation');
+legend('theory_haykin', 'simulation');
 xlabel('EbNo, dB');
 ylabel('Bit Error Rate');
 
