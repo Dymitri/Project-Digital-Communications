@@ -27,7 +27,7 @@ function varargout = application(varargin)
 
 % Edit the above text to modify the response to help application
 
-% Last Modified by GUIDE v2.5 25-Jun-2014 00:50:10
+% Last Modified by GUIDE v2.5 25-Jun-2014 08:11:38
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -66,6 +66,82 @@ guidata(hObject, handles);
 % UIWAIT makes application wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 
+function ebn0_text_Callback(hObject, eventdata, handles)
+% hObject    handle to ebn0_text (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of ebn0_text as text
+%        str2double(get(hObject,'String')) returns contents of ebn0_text as a double
+
+handles.ebn0_text=str2double(get(hObject,'string'));
+guidata(hObject, handles);
+
+
+% --- Executes during object creation, after setting all properties.
+function ebn0_text_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to ebn0_text (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function eb_start_text_Callback(hObject, eventdata, handles)
+% hObject    handle to eb_start_text (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of eb_start_text as text
+%        str2double(get(hObject,'String')) returns contents of eb_start_text as a double
+
+handles.eb_start_text=str2double(get(hObject,'string'));
+guidata(hObject, handles);
+
+% --- Executes during object creation, after setting all properties.
+function eb_start_text_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to eb_start_text (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+function eb_end_text_Callback(hObject, eventdata, handles)
+% hObject    handle to eb_end_text (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of eb_end_text as text
+%        str2double(get(hObject,'String')) returns contents of eb_end_text as a double
+
+handles.eb_end_text=str2double(get(hObject,'string'));
+guidata(hObject, handles);
+
+
+
+% --- Executes during object creation, after setting all properties.
+function eb_end_text_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to eb_end_text (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
 
 % --- Outputs from this function are returned to the command line.
 function varargout = application_OutputFcn(hObject, eventdata, handles) 
@@ -88,7 +164,7 @@ function m_text_Callback(hObject, eventdata, handles)
 %        str2double(get(hObject,'String')) returns contents of text as a double
 
 
-handles.text=str2double(get(hObject,'string'));
+handles.m_text=str2double(get(hObject,'string'));
 guidata(hObject, handles);
 
 
@@ -116,8 +192,8 @@ function bistream_text_Callback(hObject, eventdata, handles)
 %        str2double(get(hObject,'String')) returns contents of text1 as a double
 
 
-handles.text1=get(hObject,'string');
-set(handles.text1,'String',stream);
+handles.bistream_text=get(hObject,'string');
+set(handles.bistream_text,'String',stream);
 guidata(hObject, handles);
 
 
@@ -193,36 +269,37 @@ function mod_btn_Callback(hObject, eventdata, handles)
 global M;
 global N;
 
+EbNo = handles.ebn0_text;
 
 N = handles.n_text;
-M = handles.text;
+M = handles.m_text;
 
-bistream_text = get(handles.bistream_text, 'String');
+bistream_text = get(handles.bistream_text,'String');
+
 input_string = bistream_text;
 for n=1:length(input_string)
 stream(n)=bin2dec(input_string(n));
 end
-
+stream
+axes(handles.input_bit);
+stem(stream);
 
 k=log2(M); % bits per symbol
 
 [stream, nb]=prepare_stream(stream, k); %zero padding if needed
-axes(handles.input_bit);
-stem(stream);
 
 
-EbNo = 20; % to calculate snr
-fc=40; %frequency of the carrier
+fc=2*N; %frequency of the carrier
  
-% 
- fs=500;     	    % sampling frequency [Hz]
+ snr = EbNo + 10*log10(k); %signal to noise ratio
+ fs = 10*fc;          %desired sampling frequency
 % frs=N*round(fs/N); % real sampling frequency [Hz]
 % fn=frs/2;           % Nyquist frequency [Hz]
 % Ts=1/frs;	        % Sampling time [s]
 % t=[0:Ts:(N*Tb)-Ts]';% Time vector initialization
 
 
-frs=nb*round(fs/nb); % real sampling frequency [Hz]
+frs=nb*ceil(fs/nb); % real sampling frequency [Hz]
 Ts=1/frs;	        % Sampling time [s]
 Tb=1/nb;		        % Bit duration time [s]
 t=[0:Ts:(nb*Tb)-Ts]';% Time vector initialization
@@ -268,7 +345,7 @@ setappdata(0,'modulated_I',getappdata(0,'sI')'.*carrier_I);
 setappdata(0,'modulated_Q',getappdata(0,'sQ')'.*carrier_Q);
 
 % Summing I and Q
-output_signal=getappdata(0,'modulated_I')+getappdata(0,'modulated_Q');
+setappdata(0,'output_signal',getappdata(0,'modulated_I')+getappdata(0,'modulated_Q'));
 
 %plots 
 axes(handles.in_axes)
@@ -281,16 +358,19 @@ plot(t, getappdata(0,'sQ'), 'g'); title ('Modulating signal Q'); ylabel ('Q ampl
 axes(handles.quad_car_axes)
 plot(t, getappdata(0,'modulated_Q'), 'g'); title ('Modulated Q'); ylabel ('Q amplitude');  xlabel ('t[s]');
 axes(handles.out_axes)
-plot(t, output_signal); title ('Output Signal - sum of modulated I and Q'); ylabel ('Amplitude');  xlabel ('t[s]'); 
+plot(t, getappdata(0,'output_signal')); title ('Output Signal - sum of modulated I and Q'); ylabel ('Amplitude');  xlabel ('t[s]'); 
+axes(handles.fft_axes)
+cla(gca);
+axes(handles.ber_axes)
+cla(gca);
 
 %transmittiing through AWGN
 
 %calculating SNR
-snr = EbNo + 10*log10(k);
-
-noise=randn(size(output_signal)); % random noise generation
-constant=std(output_signal)/(std(noise)*10^(snr/20));
-setappdata(0,'received_signal',output_signal + noise*constant); %output of transmitter
+setappdata(0,'received_signal',add_noise(getappdata(0,'output_signal'), snr));
+% noise=randn(size(output_signal)); % random noise generation
+% constant=std(output_signal)/(std(noise)*10^(snr/20));
+% setappdata(0,'received_signal',output_signal + noise*constant); %output of transmitter
 
 axes(handles.out_nois_axes)
 plot(t,getappdata(0,'received_signal')); title ('Output Signal - transmitted through AWGN channel'); ylabel ('Amplitude');  xlabel ('t[s]');
@@ -306,26 +386,42 @@ function demod_btn_Callback(hObject, eventdata, handles)
  global M;
  global N;
  
- M = handles.text;
+ EbNo = handles.ebn0_text;
+ M = handles.m_text;
  N = handles.n_text;
+EbNo_start = handles.eb_start_text;
+EbNo_stop = handles.eb_end_text;
+EbNo_step = 1;
+ bistream_text = get(handles.bistream_text,'String');
+
+input_string = bistream_text;
+for n=1:length(input_string)
+stream(n)=bin2dec(input_string(n));
+end
+stream
  k=log2(M); % bits per symbol
+ fc=2*N; %frequency of the carrier
  
-[stream, nb]=prepare_stream(getappdata(0,'stream'), k); %zero padding if needed
+ snr = EbNo + 10*log10(k); %signal to noise ratio
+ fs = 10*fc;          %desired sampling frequency
+ filter_order = 10;
 
-
-EbNo = 20; % to calculate snr
-fc=40; %frequency of the carrier
-Tb=1/nb;		        % Bit duration time [s]
  
+[stream, nb]=prepare_stream(stream, k); %zero padding if needed
 
-fs=500;     	    % sampling frequency [Hz]
-
-frs=nb*round(fs/nb); % real sampling frequency [Hz]
+len=nb/k;
+frs=nb*ceil(fs/nb); % real sampling frequency [Hz]
 Ts=1/frs;	        % Sampling time [s]
 Tb=1/nb;		        % Bit duration time [s]
 t=[0:Ts:(nb*Tb)-Ts]';% Time vector initialization
 
 
+
+%mapping
+[ map, complex_constell ]=gray(M); %creating constellation
+grouped_bits=bitgrp(stream, M); %grouping bits
+symbols=binary2dec(grouped_bits); % creating symbols
+mapped=map2gray(symbols, map); %mapping symbols to the constellation points
 % Carriers
 carrier_I=cos(2*pi*fc*t);
 carrier_Q=-sin(2*pi*fc*t);
@@ -337,9 +433,10 @@ Q_recovered=getappdata(0,'received_signal').*carrier_Q;
 
 
 %filtration
+h_lpf=lpf(fc, frs, filter_order);
 
-filtered_I=lpf(I_recovered, fc, frs);
-filtered_Q=lpf(Q_recovered, fc, frs);
+filtered_I=filter(h_lpf,I_recovered);
+filtered_Q=filter(h_lpf,Q_recovered);
 
 
 filtered_I=2*filtered_I;
@@ -350,7 +447,7 @@ filtered_Q=2*filtered_Q;
 sym_num=nb/k;
 demodulated_I=mean(reshape(filtered_I, ceil(frs/sym_num), []))';
 demodulated_Q=mean(reshape(filtered_Q, ceil(frs/sym_num), []))';
-% received_signal=horzcat(demodulated_I, demodulated_Q)
+received_signal=horzcat(demodulated_I, demodulated_Q)
 % mappedSignal=mapped(:,2:3) %just to display and compare with receivedSignal
 
 
@@ -363,9 +460,9 @@ demodulated_Q=mean(reshape(filtered_Q, ceil(frs/sym_num), []))';
 % close all;
 
 %inverse mapping and symbols to bitstream conversion
-% recovered_constellation=rec_constell(getappdata(0,'receivedSignal'), map);
-% recovered_symbols=gray2symbols(recovered_constellation, map); 
-% setappdata(0,'recovered_bits',symbols2bits(recovered_symbols));
+recovered_constellation=rec_constell(received_signal, map);
+recovered_symbols=gray2symbols(recovered_constellation, map); 
+setappdata(0,'recovered_bits',symbols2bits(recovered_symbols));
 
 %plots in frequency most important blue and red!
 
@@ -392,13 +489,30 @@ plot(t, filtered_Q, 'r'); title('Recovered Q'); xlabel('t[s]'); ylabel('A');
 hold off;
 
 %real ber
-% [bit_errors, ber]=ber_calc(getappdata(0,'recovered_bits'), getappdata(0,'stream'));
+[bit_errors, ber]=ber_calc(getappdata(0,'recovered_bits'),stream);
 
 %theoretical ber, some approximations taken // wiki
 x=sqrt(3*k*EbNo/(M-1));
 theoretical_ber=(4/k)*(1-1/sqrt(M))*(1/2)*erfc(x/sqrt(2));
 
+[th_ber,th_ber_haykin, pr_ber, bit_errors_vec, snr_values]= ber_data( getappdata(0,'output_signal'), EbNo_start, EbNo_stop, EbNo_step, M, k, carrier_I, carrier_Q, frs, h_lpf, len, map, mapped, stream);
+axes(handles.ber_axes);
+cla(gca)
+semilogy(snr_values,th_ber,'bo-');
+hold on;
+semilogy(snr_values,th_ber_haykin,'r.-');
+semilogy(snr_values,pr_ber,'mx-');
+axis([-30 10 10^-3 0.5]) 
+grid on
+legend('theory', 'theory haykin', 'simulation');
+xlabel('EbNo, dB');
+ylabel('Bit Error Rate');
+hold off;
+
 % bit_errors
 % ber
 % theoretical_ber
-% length(recovered_bits)
+length(getappdata(0,'recovered_bits'))
+
+
+
