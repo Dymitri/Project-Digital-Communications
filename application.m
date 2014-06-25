@@ -398,7 +398,7 @@ input_string = bistream_text;
 for n=1:length(input_string)
 stream(n)=bin2dec(input_string(n));
 end
-stream
+stream;
  k=log2(M); % bits per symbol
  fc=2*N; %frequency of the carrier
  
@@ -502,7 +502,7 @@ semilogy(snr_values,th_ber,'bo-');
 hold on;
 semilogy(snr_values,th_ber_haykin,'r.-');
 semilogy(snr_values,pr_ber,'mx-');
-axis([-30 10 10^-3 0.5]) 
+axis([EbNo_start 10 10^-3 0.5]) 
 grid on
 legend('theory', 'theory haykin', 'simulation');
 xlabel('EbNo, dB');
