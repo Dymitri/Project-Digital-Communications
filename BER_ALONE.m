@@ -16,7 +16,7 @@ stop_snr=15;
 snr_values=start_snr:step:stop_snr;
 
  E=5;
- M = 16; % order of the modulation
+ M = 4; % order of the modulation
  n = 10000; % number of bits in bitstream
  k=log2(M); % bits per symbol
  EbNo = 10; % SNR per bit
@@ -79,7 +79,7 @@ modulated_Q=sQ'.*carrier_Q;
 % Summing I and Q
 output_signal=modulated_I+modulated_Q;
 P=mean(output_signal.^2)*Tb;
-E=P*max(t);
+E=P*max(t); % max(t)=1
 
 output_signal=(modulated_I+modulated_Q).*sqrt(E/Tb);
 
@@ -112,7 +112,7 @@ h_lpf=lpf(fc, frs, filter_order);
 
 for i=1:1:length(snr_vald)
 
-N0=E/k*10^(-snr_vald(i)/10);
+N0=E/k*10^(snr_vald(i)/10);
 N=N0*frs;
 
 received_signal=output_signal+(sqrt(N)*randn(1,length(t)))';

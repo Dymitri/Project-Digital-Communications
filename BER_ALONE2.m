@@ -15,12 +15,13 @@ stop_snr=15;
   
 snr_values=start_snr:step:stop_snr;
 
- E=5;
+
  M = 256; % order of the modulation
  n = 10000; % number of bits in bitstream
  k=log2(M); % bits per symbol
  EbNo = 10; % SNR per bit
  fc=2*n; %frequency of the carrier
+  E=3/2*(M-1);
  
  snr = EbNo; %signal to noise ratio
  fs = 2.3*fc;          %desired sampling frequency
