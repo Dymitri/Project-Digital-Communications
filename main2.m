@@ -1,4 +1,4 @@
-%               BER in M-QAM calcul;ations
+%              
 %Authors:
 %    Przemyslaw Dymitrowski
 %    Piotr Szkotak
@@ -10,12 +10,7 @@
 clc; clear all; 
 % close all;
 
-start_snr=0;
-step=1;
-stop_snr=20;
   
-snr_values=start_snr:step:stop_snr;
-
  M = 16; % order of the modulation
  n = 6000; % number of bits in bitstream
  k=log2(M); % bits per symbol
@@ -101,16 +96,14 @@ P=mean(output_signal.^2)*Tb
 
 
 
-snr_vald=start_snr:step:stop_snr;
-snr_val=10.^(snr_vald/10);
+snr_val=10.^(snr/10);
 
 
 
-h_lpf=lpf(fc, frs, filter_order);
 
-for i=1:1:length(snr_vald)
 
-N0=E*10^(-snr_vald(i)/10);
+
+N0=E*10^(-snr/10);
 N=N0*frs;
 
 received_signal=output_signal+(sqrt(N)*randn(1,length(t)))';
@@ -181,18 +174,12 @@ recovered_bits=symbols2bits(recovered_symbols);
 
 ber = mean(symbols ~= recovered_symbols');
 
-pr_ber(i)=ber;
-end
+
+
 
 figure(2)
 plot(demodulated_I + j*demodulated_Q, 'rd'); 
 
-figure(3)
-semilogy(snr_values,pr_ber,'mx-');
-grid on
-legend('simulation');
-xlabel('E0No, dB');
-ylabel('Symbol Error Rate');
 
 
 figure(4)

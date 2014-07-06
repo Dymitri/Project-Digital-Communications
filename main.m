@@ -22,6 +22,7 @@ clc; clear; close all;
  k=log2(M); % bits per symbol
  EbNo = 10; % SNR per bit
  fc=2*n; %frequency of the carrier
+ E=1;
  
  snr = EbNo; %signal to noise ratio
  fs = 10*fc;          %desired sampling frequency
@@ -89,32 +90,44 @@ plot(t, modulated_Q, 'g'); title ('Modulated Q'); ylabel ('Q amplitude');  xlabe
 plot(t, output_signal); title ('Output Signal - sum of modulated I and Q'); ylabel ('Amplitude');  xlabel ('t[s]'); pause;
 
 
-
+N0=E*10^(-EbNo/10);
+N=N0*frs;
 % transmittiing through AWGN
 
 
-
-
-received_signal=add_noise(output_signal, snr);
+received_signal=output_signal+(sqrt(N)*randn(1,length(t)))';
+%received_signal=add_noise(output_signal, snr_vald(i));
 %received_signal = awgn(output_signal, snr, 'measured');
 
 %demodulation
 
-I_recovered=received_signal.*carrier_I;
-Q_recovered=received_signal.*carrier_Q;
+I_recovered=received_signal.*carrier_I*sqrt(2/Tb);
+Q_recovered=received_signal.*carrier_Q*sqrt(2/Tb);
+
+%received_signal=add_noise(output_signal, snr);
+%received_signal = awgn(output_signal, snr, 'measured');
+
+%demodulation
+
+%I_recovered=received_signal.*carrier_I;
+%Q_recovered=received_signal.*carrier_Q;
 
 
 %filtration
-h_lpf=lpf(fc, frs, filter_order);
+%h_lpf=lpf(fc, frs, filter_order);
 
-filtered_I=filter(h_lpf,I_recovered);
-filtered_Q=filter(h_lpf,Q_recovered);
-
-
+%filtered_I=filter(h_lpf,I_recovered);
+%filtered_Q=filter(h_lpf,Q_recovered);
 
 
-filtered_I=2*filtered_I;
-filtered_Q=2*filtered_Q;
+
+
+%filtered_I=2*filtered_I;
+%filtered_Q=2*filtered_Q;
+
+
+filtered_I = blkproc(I_recovered, [numel(t)/n*log2(M) 1], @(x) (Tb)*mean(x)*ones(length(x), 1));
+filtered_Q = blkproc(Q_recovered, [numel(t)/n*log2(M) 1], @(x) (Tb)*mean(x)*ones(length(x), 1));
 
 %averaging
 
