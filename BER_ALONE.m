@@ -205,12 +205,7 @@ xlabel('E0No, dB');
 ylabel('Symbol Error Rate');
 
 
-figure(4)
-plot(t,sI,'b');hold on;
-plot(t,filtered_I, 'r');hold off;
-figure(5)
-plot(t,sQ,'b');hold on;
-plot(t,filtered_Q, 'r');hold off;
+
 
 
 

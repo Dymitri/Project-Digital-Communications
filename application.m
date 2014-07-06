@@ -368,7 +368,13 @@ cla(gca);
 %transmittiing through AWGN
 
 %calculating SNR
-setappdata(0,'received_signal',add_noise(getappdata(0,'output_signal'), snr));
+%setappdata(0,'received_signal',add_noise(getappdata(0,'output_signal'), snr));
+E=1;
+N0=E*10^(-snr/10);
+N=N0*frs;
+output_signal=(getappdata(0,'modulated_I')+getappdata(0,'modulated_Q')).*sqrt(2*E/Tb);
+setappdata(0,'received_signal',output_signal+(sqrt(N)*randn(1,length(t)))');
+
 % noise=randn(size(output_signal)); % random noise generation
 % constant=std(output_signal)/(std(noise)*10^(snr/20));
 % setappdata(0,'received_signal',output_signal + noise*constant); %output of transmitter
@@ -430,19 +436,19 @@ carrier_Q=-sin(2*pi*fc*t);
 
 %demodulation
 
-I_recovered=getappdata(0,'received_signal').*carrier_I;
-Q_recovered=getappdata(0,'received_signal').*carrier_Q;
+I_recovered=getappdata(0,'received_signal').*carrier_I*sqrt(2/Tb);
+Q_recovered=getappdata(0,'received_signal').*carrier_Q*sqrt(2/Tb);
 
 
 %filtration
 h_lpf=lpf(fc, frs, filter_order);
 
-filtered_I=filter(h_lpf,I_recovered);
-filtered_Q=filter(h_lpf,Q_recovered);
+filtered_I = blkproc(I_recovered, [numel(t)/n*log2(M) 1], @(x) (Tb)*mean(x)*ones(length(x), 1));
+filtered_Q = blkproc(Q_recovered, [numel(t)/n*log2(M) 1], @(x) (Tb)*mean(x)*ones(length(x), 1));
 
-
-filtered_I=2*filtered_I;
-filtered_Q=2*filtered_Q;
+% 
+% filtered_I=2*filtered_I;
+% filtered_Q=2*filtered_Q;
 
 %averaging
 
