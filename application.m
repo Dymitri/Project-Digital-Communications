@@ -27,7 +27,7 @@ function varargout = application(varargin)
 
 % Edit the above text to modify the response to help application
 
-% Last Modified by GUIDE v2.5 25-Jun-2014 08:11:38
+% Last Modified by GUIDE v2.5 06-Jul-2014 21:26:42
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -291,7 +291,7 @@ k=log2(M); % bits per symbol
 
 fc=2*N; %frequency of the carrier
  
- snr = EbNo + 10*log10(k); %signal to noise ratio
+ snr = EbNo; %signal to noise ratio
  fs = 10*fc;          %desired sampling frequency
 % frs=N*round(fs/N); % real sampling frequency [Hz]
 % fn=frs/2;           % Nyquist frequency [Hz]
@@ -313,6 +313,8 @@ symbols=binary2dec(grouped_bits); % creating symbols
 mapped=map2gray(symbols, map); %mapping symbols to the constellation points
 %plotting constellation 
 axes(handles.const_axes)
+cla(gca);
+hold on;
 plot(real(complex_constell),imag(complex_constell),'b.');
 
 
@@ -361,8 +363,7 @@ axes(handles.out_axes)
 plot(t, getappdata(0,'output_signal')); title ('Output Signal - sum of modulated I and Q'); ylabel ('Amplitude');  xlabel ('t[s]'); 
 axes(handles.fft_axes)
 cla(gca);
-axes(handles.ber_axes)
-cla(gca);
+
 
 %transmittiing through AWGN
 
@@ -389,9 +390,9 @@ function demod_btn_Callback(hObject, eventdata, handles)
  EbNo = handles.ebn0_text;
  M = handles.m_text;
  N = handles.n_text;
-EbNo_start = handles.eb_start_text;
-EbNo_stop = handles.eb_end_text;
-EbNo_step = 1;
+snr_start = handles.eb_start_text;
+snr_stop = handles.eb_end_text;
+snr_step = 1;
  bistream_text = get(handles.bistream_text,'String');
 
 input_string = bistream_text;
@@ -402,7 +403,7 @@ stream;
  k=log2(M); % bits per symbol
  fc=2*N; %frequency of the carrier
  
- snr = EbNo + 10*log10(k); %signal to noise ratio
+ snr = EbNo; %signal to noise ratio
  fs = 10*fc;          %desired sampling frequency
  filter_order = 10;
 
@@ -410,6 +411,7 @@ stream;
 [stream, nb]=prepare_stream(stream, k); %zero padding if needed
 
 len=nb/k;
+
 frs=nb*ceil(fs/nb); % real sampling frequency [Hz]
 Ts=1/frs;	        % Sampling time [s]
 Tb=1/nb;		        % Bit duration time [s]
@@ -475,6 +477,10 @@ plot_fft(I_recovered, frs, 'y', 'Spectrum of modulated signal after multiplicati
 plot_fft(2*filtered_I, frs, 'r', 'Spectrum of demodulated signal after LPF'); 
 hold off;
 
+axes(handles.const_axes)
+plot(demodulated_I + j*demodulated_Q, 'rd');
+hold off;
+
 %plots time
 axes(handles.in_axes);
 cla(gca);hold on;
@@ -488,31 +494,173 @@ plot(t, getappdata(0,'sQ'), 'b'); title('Modulating signal Q'); xlabel('t[s]'); 
 plot(t, filtered_Q, 'r'); title('Recovered Q'); xlabel('t[s]'); ylabel('A'); 
 hold off;
 
-%real ber
-[bit_errors, ber]=ber_calc(getappdata(0,'recovered_bits'),stream);
 
-%theoretical ber, some approximations taken // wiki
-x=sqrt(3*k*EbNo/(M-1));
-theoretical_ber=(4/k)*(1-1/sqrt(M))*(1/2)*erfc(x/sqrt(2));
 
-[th_ber,th_ber_haykin, pr_ber, bit_errors_vec, snr_values]= ber_data( getappdata(0,'output_signal'), EbNo_start, EbNo_stop, EbNo_step, M, k, carrier_I, carrier_Q, frs, h_lpf, len, map, mapped, stream);
-axes(handles.ber_axes);
-cla(gca)
-semilogy(snr_values,th_ber,'bo-');
-hold on;
-semilogy(snr_values,th_ber_haykin,'r.-');
-semilogy(snr_values,pr_ber,'mx-');
-axis([EbNo_start 10 10^-3 0.5]) 
+
+
+function SER_edit_Callback(hObject, eventdata, handles)
+% hObject    handle to SER_edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of SER_edit as text
+%        str2double(get(hObject,'String')) returns contents of SER_edit as a double
+
+handles.SER_edit=str2double(get(hObject,'string'));
+guidata(hObject, handles);
+
+% --- Executes during object creation, after setting all properties.
+function SER_edit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to SER_edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in ser_btn.
+function ser_btn_Callback(hObject, eventdata, handles)
+% hObject    handle to ser_btn (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global M;
+
+n = handles.SER_edit;
+M = handles.m_text;
+EbNo = handles.ebn0_text;
+start_snr = handles.eb_start_text;
+stop_snr = handles.eb_end_text;
+step = 1;
+k=log2(M);
+
+fc=2*n; %frequency of the carrier
+ 
+snr = EbNo; %signal to noise ratio
+fs = 10*fc;          %desired sampling frequency
+filter_order = 10;
+
+stream = RandBitStream(n);
+[stream, nb]=prepare_stream(stream, k)
+
+frs=nb*ceil(fs/nb); % real sampling frequency [Hz]
+Ts=1/frs;	        % Sampling time [s]
+Tb=1/nb;		        % Bit duration time [s]
+t=[0:Ts:(nb*Tb)-Ts]';% Time vector initialization
+
+
+[ map, complex_constell ]=gray(M); %creating constellation
+grouped_bits=bitgrp(stream, M); %grouping bits
+symbols=binary2dec(grouped_bits); % creating symbols
+mapped=map2gray(symbols, map); %mapping symbols to the constellation points
+
+
+
+%splitting
+[I, Q]=split_stream(mapped);
+
+
+
+% creating modulating signals sI and sQ
+
+len=nb/k; %length of I or Q in symbols
+rep=frs/len; %number of repetitions of a single bit (to obtain square wave)
+
+
+for i=1:len  
+        sI(i*rep:(i+1)*rep)=I(i);
+        sQ(i*rep:(i+1)*rep)=Q(i);
+end
+sI=sI(end-frs:end-1); %modulating signals
+sQ=sQ(end-frs:end-1);
+
+
+
+% Carriers
+carrier_I=cos(2*pi*fc*t);
+carrier_Q=-sin(2*pi*fc*t);
+
+% Modulating
+modulated_I=sI'.*carrier_I;
+modulated_Q=sQ'.*carrier_Q;
+
+% Summing I and Q
+%output_signal=modulated_I+modulated_Q;
+% P=mean(output_signal.^2)*Tb;
+% E=P*max(t); % max(t)=1
+E = 1;
+
+output_signal=(modulated_I+modulated_Q).*sqrt(2*E/Tb);
+
+
+
+
+
+% transmittiing through AWGN
+
+P=mean(output_signal.^2)*Tb
+
+
+snr_vald=start_snr:step:stop_snr;
+snr_val=10.^(snr_vald/10);
+%snr_val=10.^((snr_vald-log2(k))/10);
+
+%snr_val=snr_val/sqrt(k);
+
+h_lpf=lpf(fc, frs, filter_order);
+
+for i=1:1:length(snr_vald)
+
+N0=E*10^(-snr_vald(i)/10);
+N=N0*frs;
+
+received_signal=output_signal+(sqrt(N)*randn(1,length(t)))';
+
+
+%demodulation
+
+I_recovered=received_signal.*carrier_I*sqrt(2/Tb);
+Q_recovered=received_signal.*carrier_Q*sqrt(2/Tb);
+
+
+%filtration
+
+
+filtered_I = blkproc(I_recovered, [numel(t)/n*log2(M) 1], @(x) (Tb)*mean(x)*ones(length(x), 1));
+filtered_Q = blkproc(Q_recovered, [numel(t)/n*log2(M) 1], @(x) (Tb)*mean(x)*ones(length(x), 1));
+
+
+demodulated_I=mean(reshape(filtered_I, ceil(frs/len), []))';
+demodulated_Q=mean(reshape(filtered_Q, ceil(frs/len), []))';
+receivedSignal=horzcat(demodulated_I, demodulated_Q);
+mappedSignal=mapped(:,2:3); %just to display and compare with receivedSignal
+
+
+
+
+%inverse mapping and symbols to bitstream conversion
+recovered_constellation=rec_constell(receivedSignal, map);
+recovered_symbols=gray2symbols(recovered_constellation, map); 
+recovered_bits=symbols2bits(recovered_symbols);
+
+
+ber = mean(symbols ~= recovered_symbols');
+
+pr_ber(i)=ber;
+end
+
+% figure(2)
+% plot(demodulated_I + j*demodulated_Q, 'rd'); 
+
+figure();
+semilogy(snr_vald,pr_ber,'mx-');
+%axis([-30 10 10^-5 0.5])  
 grid on
-legend('theory', 'theory haykin', 'simulation');
-xlabel('EbNo, dB');
-ylabel('Bit Error Rate');
-hold off;
-
-% bit_errors
-% ber
-% theoretical_ber
-length(getappdata(0,'recovered_bits'))
-
+legend('simulation');
+xlabel('E0No, dB');
+ylabel('Symbol Error Rate');
 
 

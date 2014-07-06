@@ -1,29 +1,29 @@
 %               BER in M-QAM calcul;ations
 %Authors:
-%    Przemys³aw Dymitrowski
+%    Przemyslaw Dymitrowski
 %    Piotr Szkotak
 %    Electronics and Telecommunications III year
 %    07.2014
 %
 
 
-clc; clear all; close all;
+clc; clear all; 
+% close all;
 
-start_snr=-5;
+start_snr=0;
 step=1;
-stop_snr=15;
+stop_snr=20;
   
 snr_values=start_snr:step:stop_snr;
 
- E=5;
  M = 16; % order of the modulation
- n = 10000; % number of bits in bitstream
+ n = 6000; % number of bits in bitstream
  k=log2(M); % bits per symbol
  EbNo = 10; % SNR per bit
  fc=2*n; %frequency of the carrier
  
  snr = EbNo; %signal to noise ratio
- fs = 2.3*fc;          %desired sampling frequency
+ fs = 10*fc;          %desired sampling frequency
  filter_order = 10;
  
 stream=RandBitStream(n); %generating random bitstream
@@ -78,10 +78,11 @@ modulated_Q=sQ'.*carrier_Q;
 
 % Summing I and Q
 output_signal=modulated_I+modulated_Q;
-P=mean(output_signal.^2)*Tb;
-E=P*max(t);
+% P=mean(output_signal.^2)*Tb;
+% E=P*max(t); % max(t)=1
+E = 1;
 
-output_signal=(modulated_I+modulated_Q).*sqrt(E/Tb);
+output_signal=(modulated_I+modulated_Q).*sqrt(2*E/Tb);
 
 %plots 
 %plot(t, sI, 'r'); title ('Modulating signal I'); ylabel ('I amplitude');  xlabel ('t[s]'); pause;
@@ -97,7 +98,7 @@ output_signal=(modulated_I+modulated_Q).*sqrt(E/Tb);
 
 P=mean(output_signal.^2)*Tb
 
-snr_vald=start_snr:step:stop_snr;
+
 
 
 
@@ -112,7 +113,7 @@ h_lpf=lpf(fc, frs, filter_order);
 
 for i=1:1:length(snr_vald)
 
-N0=E/k*10^(-snr_vald(i)/10);
+N0=E*10^(-snr_vald(i)/10);
 N=N0*frs;
 
 received_signal=output_signal+(sqrt(N)*randn(1,length(t)))';
@@ -121,21 +122,25 @@ received_signal=output_signal+(sqrt(N)*randn(1,length(t)))';
 
 %demodulation
 
-I_recovered=received_signal.*carrier_I.*sqrt(k/Tb);
-Q_recovered=received_signal.*carrier_Q.*sqrt(k/Tb);
+I_recovered=received_signal.*carrier_I*sqrt(2/Tb);
+Q_recovered=received_signal.*carrier_Q*sqrt(2/Tb);
 
 
 %filtration
 
 
-filtered_I=filter(h_lpf,I_recovered);
-filtered_Q=filter(h_lpf,Q_recovered);
+% filtered_I=filter(h_lpf,I_recovered);
+% filtered_Q=filter(h_lpf,Q_recovered);
+
+filtered_I = blkproc(I_recovered, [numel(t)/n*log2(M) 1], @(x) (Tb)*mean(x)*ones(length(x), 1));
+filtered_Q = blkproc(Q_recovered, [numel(t)/n*log2(M) 1], @(x) (Tb)*mean(x)*ones(length(x), 1));
+% figure(1)
+% plot(I_recovered/sqrt(2/Tb)); hold on;
+% plot(filtered_I, 'r'); hold off;
 
 
-
-
-filtered_I=2*filtered_I;
-filtered_Q=2*filtered_Q;
+% filtered_I=2*filtered_I;
+% filtered_Q=2*filtered_Q;
 
 %averaging
 
@@ -144,6 +149,7 @@ demodulated_I=mean(reshape(filtered_I, ceil(frs/len), []))';
 demodulated_Q=mean(reshape(filtered_Q, ceil(frs/len), []))';
 receivedSignal=horzcat(demodulated_I, demodulated_Q);
 mappedSignal=mapped(:,2:3); %just to display and compare with receivedSignal
+
 
 %plots, constellation
 %fig = scatterplot(complex_constell); pause;
@@ -180,27 +186,32 @@ recovered_bits=symbols2bits(recovered_symbols);
 %plot(t, filtered_Q, 'r'); title('Recovered Q'); xlabel('t[s]'); ylabel('A'); pause
 
 %real ber
-[bit_errors, ber]=ber_calc(recovered_bits, stream);
+% [bit_errors, ber]=ber_calc(recovered_bits, stream);
+
+ber = mean(symbols ~= recovered_symbols');
 
 pr_ber(i)=ber;
 end
 
+figure(2)
+plot(demodulated_I + j*demodulated_Q, 'rd'); 
 
-x=sqrt(3*k*snr_val/(M-1));
-th_ber=(4/k)*(1-1/sqrt(M))*(1/2)*erfc(x/sqrt(2));
-
-th_ber_haykin=0.5*(1-(1/sqrt(M)))*erfc(sqrt(snr_val));
-
-
-
-semilogy(snr_values,th_ber_haykin,'r.-');
-semilogy(snr_values,th_ber,'bo-');
-hold on;
+figure(3)
 semilogy(snr_values,pr_ber,'mx-');
 %axis([-30 10 10^-5 0.5])  
 grid on
-legend('theory haykin', 'simulation');
-xlabel('EbNo, dB');
-ylabel('Bit Error Rate');
+legend('simulation');
+xlabel('E0No, dB');
+ylabel('Symbol Error Rate');
+
+
+figure(4)
+plot(t,sI,'b');hold on;
+plot(t,filtered_I, 'r');hold off;
+figure(5)
+plot(t,sQ,'b');hold on;
+plot(t,filtered_Q, 'r');hold off;
+
+
 
 %length(recovered_bits) 

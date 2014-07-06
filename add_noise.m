@@ -3,7 +3,7 @@ function [ nsignal ] = add_noise( signal, snr )
 
 
 noise=randn(size(signal)); % random noise generation
-constant=std(signal)/(std(noise)*10^(snr/20));
+constant=std(signal)/(std(noise)*10^(snr/10));
 nsignal=signal + noise*constant; %input of the receiver
 
 
