@@ -16,14 +16,8 @@ stop_snr=20;
   
 snr_values=start_snr:step:stop_snr;
 
-<<<<<<< HEAD
  M = 16; % order of the modulation
  n = 6000; % number of bits in bitstream
-=======
- E=5;
- M = 4; % order of the modulation
- n = 10000; % number of bits in bitstream
->>>>>>> a0a06561f0854b574aa751e71400557061ff7d0e
  k=log2(M); % bits per symbol
  EbNo = 10; % SNR per bit
  fc=2*n; %frequency of the carrier
@@ -84,14 +78,9 @@ modulated_Q=sQ'.*carrier_Q;
 
 % Summing I and Q
 output_signal=modulated_I+modulated_Q;
-<<<<<<< HEAD
 % P=mean(output_signal.^2)*Tb;
 % E=P*max(t); % max(t)=1
 E = 1;
-=======
-P=mean(output_signal.^2)*Tb;
-E=P*max(t); % max(t)=1
->>>>>>> a0a06561f0854b574aa751e71400557061ff7d0e
 
 output_signal=(modulated_I+modulated_Q).*sqrt(2*E/Tb);
 
@@ -124,11 +113,7 @@ h_lpf=lpf(fc, frs, filter_order);
 
 for i=1:1:length(snr_vald)
 
-<<<<<<< HEAD
 N0=E*10^(-snr_vald(i)/10);
-=======
-N0=E/k*10^(snr_vald(i)/10);
->>>>>>> a0a06561f0854b574aa751e71400557061ff7d0e
 N=N0*frs;
 
 received_signal=output_signal+(sqrt(N)*randn(1,length(t)))';
