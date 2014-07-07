@@ -501,8 +501,8 @@ Q_recovered=received_signal.*carrier_Q*sqrt(2/Tb);
 %filtration
 
 
-filtered_I = blkproc(I_recovered, [numel(t)/nk 1], @(x) (Tb)*mean(x)*ones(length(x), 1));
-filtered_Q = blkproc(Q_recovered, [numel(t)/nk 1], @(x) (Tb)*mean(x)*ones(length(x), 1));
+filtered_I = blkproc(I_recovered, [rep 1], @(x) (Tb)*mean(x)*ones(length(x), 1));
+filtered_Q = blkproc(Q_recovered, [rep 1], @(x) (Tb)*mean(x)*ones(length(x), 1));
 % figure(1)
 % plot(I_recovered/sqrt(2/Tb)); hold on;
 % plot(filtered_I, 'r'); hold off;

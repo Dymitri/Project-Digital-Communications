@@ -12,7 +12,7 @@ clc; clear all;
 
   
  M = 16; % order of the modulation
- n = 6000; % number of bits in bitstream
+ n = 20; % number of bits in bitstream
  k=log2(M); % bits per symbol
  EbNo = 10; % SNR per bit
  fc=2*n; %frequency of the carrier
@@ -157,17 +157,19 @@ recovered_bits=symbols2bits(recovered_symbols);
 %hold off;
 
 %plots time
-%plot(t, sI, 'b'); title('Modulating signal I'); xlabel('t[s]'); ylabel('A'); pause
-%hold on;
-%plot(t, filtered_I, 'r'); title('Recovered I'); xlabel('t[s]'); ylabel('A'); pause
-%hold off;
-%plot(t, modulated_I, 'r'); title('Modulated signal (sI*carrier)');xlabel('t[s]'); ylabel('A'); pause
-%hold on;
-%plot(t, I_recovered, 'g'); title('Modulated signal after multiplication by carrier at the receiver');xlabel('t[s]'); ylabel('A'); pause
+figure(5)
+plot(t, sI, 'b'); title('Modulating signal I'); xlabel('t[s]'); ylabel('A'); pause
+hold on;
+plot(t, filtered_I, 'r'); title('Recovered I'); xlabel('t[s]'); ylabel('A'); pause
+hold off;
+figure(6)
+plot(t, modulated_I, 'r'); title('Modulated signal (sI*carrier)');xlabel('t[s]'); ylabel('A'); pause
+hold on;
+plot(t, I_recovered, 'g'); title('Modulated signal after multiplication by carrier at the receiver');xlabel('t[s]'); ylabel('A'); pause
 
-%plot(t, sQ, 'b'); title('Modulating signal Q'); xlabel('t[s]'); ylabel('A'); pause
-%hold on;
-%plot(t, filtered_Q, 'r'); title('Recovered Q'); xlabel('t[s]'); ylabel('A'); pause
+plot(t, sQ, 'b'); title('Modulating signal Q'); xlabel('t[s]'); ylabel('A'); pause
+hold on;
+plot(t, filtered_Q, 'r'); title('Recovered Q'); xlabel('t[s]'); ylabel('A'); pause
 
 %real ber
 % [bit_errors, ber]=ber_calc(recovered_bits, stream);
