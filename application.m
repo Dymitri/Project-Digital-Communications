@@ -500,7 +500,7 @@ Q_recovered=received_signal.*carrier_Q*sqrt(2/Tb);
 
 %filtration
 
-
+%filtered_I = blkproc(I_recovered, [numel(t)/nk*log2(M) 1], @(x) (Tb)*mean(x)*ones(length(x), 1));
 filtered_I = blkproc(I_recovered, [rep 1], @(x) (Tb)*mean(x)*ones(length(x), 1));
 filtered_Q = blkproc(Q_recovered, [rep 1], @(x) (Tb)*mean(x)*ones(length(x), 1));
 % figure(1)
