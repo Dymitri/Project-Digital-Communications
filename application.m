@@ -27,7 +27,7 @@ function varargout = application(varargin)
 
 % Edit the above text to modify the response to help application
 
-% Last Modified by GUIDE v2.5 06-Jul-2014 21:26:42
+% Last Modified by GUIDE v2.5 07-Jul-2014 17:41:46
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -245,10 +245,10 @@ function gen_bits_btn_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 % global stream
-global N;
+
 % global stream;
-N=handles.n_text;   
-stream = RandBitStream(N);
+n=handles.n_text;   
+stream = RandBitStream(n);
 stream = num2str(transpose(stream)); % we convert it to string
 stream = stream(~isspace(stream))'; % we remove the spaces
 stream = strtrim(stream);% trim
@@ -266,21 +266,20 @@ function mod_btn_Callback(hObject, eventdata, handles)
 % hObject    handle to mod_btn (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-global M;
-global N;
+
 
 EbNo = handles.ebn0_text;
 
-N = handles.n_text;
+n = handles.n_text;
 M = handles.m_text;
 
 bistream_text = get(handles.bistream_text,'String');
 
 input_string = bistream_text;
-for n=1:length(input_string)
-stream(n)=bin2dec(input_string(n));
+for x=1:length(input_string)
+stream(x)=bin2dec(input_string(x));
 end
-stream
+stream;
 axes(handles.input_bit);
 stem(stream);
 
@@ -289,7 +288,7 @@ k=log2(M); % bits per symbol
 [stream, nb]=prepare_stream(stream, k); %zero padding if needed
 
 
-fc=2*N; %frequency of the carrier
+fc=2*n; %frequency of the carrier
  
  snr = EbNo; %signal to noise ratio
  fs = 10*fc;          %desired sampling frequency
@@ -327,40 +326,55 @@ plot(real(complex_constell),imag(complex_constell),'b.');
 
 len=nb/k; %length of I or Q in symbols
 rep=frs/len; %number of repetitions of a single bit (to obtain square wave)
-
-x=1:1:(len+1)*(1/Ts*k);
-for i=1:len
-    for j=1:.1:i+1;
-        sI(x(i*rep:(i+1)*rep))=I(i);
-        sQ(x(i*rep:(i+1)*rep))=Q(i);
-    end
+ 
+for i=1:len  
+        sI(i*rep:(i+1)*rep)=I(i);
+        sQ(i*rep:(i+1)*rep)=Q(i);
 end
-setappdata(0,'sI',sI(end-frs:end-1));
-setappdata(0,'sQ',sQ(end-frs:end-1));
+
+% setappdata(0,'sI',sI(end-frs:end-1));
+% setappdata(0,'sQ',sQ(end-frs:end-1));
+
+
+sI=sI(end-frs:end-1); %modulating signals
+sQ=sQ(end-frs:end-1);
+
+
+
 
 % Carriers
 carrier_I=cos(2*pi*fc*t);
 carrier_Q=-sin(2*pi*fc*t);
 
 % Modulating
-setappdata(0,'modulated_I',getappdata(0,'sI')'.*carrier_I);
-setappdata(0,'modulated_Q',getappdata(0,'sQ')'.*carrier_Q);
+% setappdata(0,'modulated_I',getappdata(0,'sI')'.*carrier_I);
+% setappdata(0,'modulated_Q',getappdata(0,'sQ')'.*carrier_Q);
+
+modulated_I=sI'.*carrier_I;
+modulated_Q=sQ'.*carrier_Q;
 
 % Summing I and Q
-setappdata(0,'output_signal',getappdata(0,'modulated_I')+getappdata(0,'modulated_Q'));
+% setappdata(0,'output_signal',getappdata(0,'modulated_I')+getappdata(0,'modulated_Q'));
+output_signal = modulated_I + modulated_Q;
 
 %plots 
 axes(handles.in_axes)
-plot(t, getappdata(0,'sI'), 'r'); title ('Modulating signal I'); ylabel ('I amplitude');  xlabel ('t[s]'); 
+% plot(t, getappdata(0,'sI'), 'r'); title ('Modulating signal I'); ylabel ('I amplitude');  xlabel ('t[s]'); 
+plot(t, sI, 'r'); title ('Modulating signal I'); ylabel ('I amplitude');  xlabel ('t[s]'); 
 axes(handles.in_car_axes)
-plot(t, getappdata(0,'modulated_I'), 'r'); title ('Modulated I'); ylabel ('I amplitude');  xlabel ('t[s]'); 
+% plot(t, getappdata(0,'modulated_I'), 'r'); title ('Modulated I'); ylabel ('I amplitude');  xlabel ('t[s]'); 
+plot(t, modulated_I, 'r'); title ('Modulated I'); ylabel ('I amplitude');  xlabel ('t[s]'); 
 
 axes(handles.quad_axes)
-plot(t, getappdata(0,'sQ'), 'g'); title ('Modulating signal Q'); ylabel ('Q amplitude'); xlabel ('t[s]'); 
+% plot(t, getappdata(0,'sQ'), 'g'); title ('Modulating signal Q'); ylabel ('Q amplitude'); xlabel ('t[s]'); 
+plot(t, sQ, 'g'); title ('Modulating signal Q'); ylabel ('I amplitude');  xlabel ('t[s]'); 
+
 axes(handles.quad_car_axes)
-plot(t, getappdata(0,'modulated_Q'), 'g'); title ('Modulated Q'); ylabel ('Q amplitude');  xlabel ('t[s]');
+% plot(t, getappdata(0,'modulated_Q'), 'g'); title ('Modulated Q'); ylabel ('Q amplitude');  xlabel ('t[s]');
+plot(t, modulated_Q, 'g'); title ('Modulated Q'); ylabel ('I amplitude');  xlabel ('t[s]'); 
+
 axes(handles.out_axes)
-plot(t, getappdata(0,'output_signal')); title ('Output Signal - sum of modulated I and Q'); ylabel ('Amplitude');  xlabel ('t[s]'); 
+plot(t, output_signal); title ('Output Signal - sum of modulated I and Q'); ylabel ('Amplitude');  xlabel ('t[s]'); 
 axes(handles.fft_axes)
 cla(gca);
 
@@ -372,15 +386,13 @@ cla(gca);
 E=1;
 N0=E*10^(-snr/10);
 N=N0*frs;
-output_signal=(getappdata(0,'modulated_I')+getappdata(0,'modulated_Q')).*sqrt(2*E/Tb);
-setappdata(0,'received_signal',output_signal+(sqrt(N)*randn(1,length(t)))');
+% setappdata(0,'output_signal',getappdata(0,'modulated_I')+getappdata(0,'modulated_Q').*sqrt(2*E/Tb));
+output_signal = (modulated_I +modulated_Q)*sqrt(2*E/Tb);
+received_signal=output_signal+(sqrt(N)*randn(1,length(t)))';
 
-% noise=randn(size(output_signal)); % random noise generation
-% constant=std(output_signal)/(std(noise)*10^(snr/20));
-% setappdata(0,'received_signal',output_signal + noise*constant); %output of transmitter
 
 axes(handles.out_nois_axes)
-plot(t,getappdata(0,'received_signal')); title ('Output Signal - transmitted through AWGN channel'); ylabel ('Amplitude');  xlabel ('t[s]');
+plot(t,received_signal); title ('Output Signal - transmitted through AWGN channel'); ylabel ('Amplitude');  xlabel ('t[s]');
 
 
 
@@ -390,34 +402,28 @@ function demod_btn_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 % 
- global M;
- global N;
+
  
  EbNo = handles.ebn0_text;
  M = handles.m_text;
- N = handles.n_text;
-snr_start = handles.eb_start_text;
-snr_stop = handles.eb_end_text;
-snr_step = 1;
+ n = handles.n_text;
  bistream_text = get(handles.bistream_text,'String');
 
 input_string = bistream_text;
-for n=1:length(input_string)
-stream(n)=bin2dec(input_string(n));
+for x=1:length(input_string)
+stream(x)=bin2dec(input_string(x));
 end
 stream;
  k=log2(M); % bits per symbol
- fc=2*N; %frequency of the carrier
+ fc=2*n; %frequency of the carrier
  
  snr = EbNo; %signal to noise ratio
  fs = 10*fc;          %desired sampling frequency
- filter_order = 10;
 
  
 [stream, nb]=prepare_stream(stream, k); %zero padding if needed
 
-len=nb/k;
-
+nk = nb.*k;
 frs=nb*ceil(fs/nb); % real sampling frequency [Hz]
 Ts=1/frs;	        % Sampling time [s]
 Tb=1/nb;		        % Bit duration time [s]
@@ -430,57 +436,113 @@ t=[0:Ts:(nb*Tb)-Ts]';% Time vector initialization
 grouped_bits=bitgrp(stream, M); %grouping bits
 symbols=binary2dec(grouped_bits); % creating symbols
 mapped=map2gray(symbols, map); %mapping symbols to the constellation points
+
+
+[I, Q]=split_stream(mapped);
+
+% creating modulating signals sI and sQ
+
+len=nb/k; %length of I or Q in symbols
+rep=frs/len; %number of repetitions of a single bit (to obtain square wave)
+
+
+for i=1:len  
+        sI(i*rep:(i+1)*rep)=I(i);
+        sQ(i*rep:(i+1)*rep)=Q(i);
+end
+sI=sI(end-frs:end-1); %modulating signals
+sQ=sQ(end-frs:end-1);
+
+
+
 % Carriers
 carrier_I=cos(2*pi*fc*t);
 carrier_Q=-sin(2*pi*fc*t);
 
+% Modulating
+modulated_I=sI'.*carrier_I;
+modulated_Q=sQ'.*carrier_Q;
+
+% Summing I and Q
+output_signal=modulated_I+modulated_Q;
+E = 1;
+
+output_signal=(modulated_I+modulated_Q).*sqrt(2*E/Tb);
+
+
+% transmittiing through AWGN
+
+P=mean(output_signal.^2)*Tb
+
+
+
+
+
+
+snr_val=10.^(snr/10);
+
+
+
+
+
+
+N0=E*10^(-snr/10);
+N=N0*frs;
+
+received_signal=output_signal+(sqrt(N)*randn(1,length(t)))';
+
+
 %demodulation
 
-I_recovered=getappdata(0,'received_signal').*carrier_I*sqrt(2/Tb);
-Q_recovered=getappdata(0,'received_signal').*carrier_Q*sqrt(2/Tb);
+I_recovered=received_signal.*carrier_I*sqrt(2/Tb);
+Q_recovered=received_signal.*carrier_Q*sqrt(2/Tb);
 
 
 %filtration
-h_lpf=lpf(fc, frs, filter_order);
 
-filtered_I = blkproc(I_recovered, [numel(t)/n*log2(M) 1], @(x) (Tb)*mean(x)*ones(length(x), 1));
-filtered_Q = blkproc(Q_recovered, [numel(t)/n*log2(M) 1], @(x) (Tb)*mean(x)*ones(length(x), 1));
 
-% 
-% filtered_I=2*filtered_I;
-% filtered_Q=2*filtered_Q;
+filtered_I = blkproc(I_recovered, [numel(t)/nk 1], @(x) (Tb)*mean(x)*ones(length(x), 1));
+filtered_Q = blkproc(Q_recovered, [numel(t)/nk 1], @(x) (Tb)*mean(x)*ones(length(x), 1));
+% figure(1)
+% plot(I_recovered/sqrt(2/Tb)); hold on;
+% plot(filtered_I, 'r'); hold off;
+
+
 
 %averaging
 
-sym_num=nb/k;
-demodulated_I=mean(reshape(filtered_I, ceil(frs/sym_num), []))';
-demodulated_Q=mean(reshape(filtered_Q, ceil(frs/sym_num), []))';
-received_signal=horzcat(demodulated_I, demodulated_Q)
-% mappedSignal=mapped(:,2:3) %just to display and compare with receivedSignal
+
+demodulated_I=mean(reshape(filtered_I, ceil(frs/len), []))';
+demodulated_Q=mean(reshape(filtered_Q, ceil(frs/len), []))';
+receivedSignal=horzcat(demodulated_I, demodulated_Q);
+mappedSignal=mapped(:,2:3); %just to display and compare with receivedSignal
 
 
-% %plots, constellation
-% fig = scatterplot(complex_constell); pause;
-% hold on;
-% scatterplot(mapped(:,2:3), 1, 0,'ro',fig); pause;
-% scatterplot(receivedSignal, 1, 0, 'g.', fig); pause;
-% hold off;
-% close all;
+%plots, constellation
+%fig = scatterplot(complex_constell); pause;
+%hold on;
+%scatterplot(mapped(:,2:3), 1, 0,'ro',fig); pause;
+%scatterplot(receivedSignal, 1, 0, 'g.', fig); pause;
+%hold off;
+%close all;
 
 %inverse mapping and symbols to bitstream conversion
-recovered_constellation=rec_constell(received_signal, map);
+recovered_constellation=rec_constell(receivedSignal, map);
 recovered_symbols=gray2symbols(recovered_constellation, map); 
-setappdata(0,'recovered_bits',symbols2bits(recovered_symbols));
+recovered_bits=symbols2bits(recovered_symbols);
+
+
+ber = mean(symbols ~= recovered_symbols');
+
 
 %plots in frequency most important blue and red!
 
 axes(handles.fft_axes)
 cla(gca);
 hold on;
-plot_fft(getappdata(0,'sI'), frs, 'b', 'Spectrum of modulating signal sI'); 
-plot_fft(getappdata(0,'modulated_I'), frs, 'g', 'Spectrum of modulated signal (sI*carrier)'); 
-plot_fft(I_recovered, frs, 'y', 'Spectrum of modulated signal after multiplication by carrier at the receiver'); 
-plot_fft(2*filtered_I, frs, 'r', 'Spectrum of demodulated signal after LPF'); 
+plot_fft(sI, frs, 'b', 'Spectrum of modulating signal sI'); 
+plot_fft(modulated_I', frs, 'g', 'Spectrum of modulated signal (sI*carrier)'); 
+plot_fft(filtered_I, frs, 'r', 'Spectrum of demodulated signal after LPF'); 
 hold off;
 
 axes(handles.const_axes)
@@ -490,13 +552,13 @@ hold off;
 %plots time
 axes(handles.in_axes);
 cla(gca);hold on;
-plot(t, getappdata(0,'sI'), 'b'); title('Modulating signal I'); xlabel('t[s]'); ylabel('Amplitude');
+plot(t,sI, 'b'); title('Modulating signal I'); xlabel('t[s]'); ylabel('Amplitude');
 plot(t, filtered_I, 'r'); title('Recovered I'); xlabel('t[s]'); ylabel('A');
 hold off;
 
 axes(handles.quad_axes);
 cla(gca); hold on;
-plot(t, getappdata(0,'sQ'), 'b'); title('Modulating signal Q'); xlabel('t[s]'); ylabel('Amplitude');  
+plot(t, sQ', 'b'); title('Modulating signal Q'); xlabel('t[s]'); ylabel('Amplitude');  
 plot(t, filtered_Q, 'r'); title('Recovered Q'); xlabel('t[s]'); ylabel('A'); 
 hold off;
 
@@ -533,7 +595,7 @@ function ser_btn_Callback(hObject, eventdata, handles)
 % hObject    handle to ser_btn (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-global M;
+
 
 n = handles.SER_edit;
 M = handles.m_text;
@@ -551,6 +613,8 @@ filter_order = 10;
 
 stream = RandBitStream(n);
 [stream, nb]=prepare_stream(stream, k)
+
+nk = nb.*k;
 
 frs=nb*ceil(fs/nb); % real sampling frequency [Hz]
 Ts=1/frs;	        % Sampling time [s]
@@ -635,8 +699,8 @@ Q_recovered=received_signal.*carrier_Q*sqrt(2/Tb);
 %filtration
 
 
-filtered_I = blkproc(I_recovered, [numel(t)/n*log2(M) 1], @(x) (Tb)*mean(x)*ones(length(x), 1));
-filtered_Q = blkproc(Q_recovered, [numel(t)/n*log2(M) 1], @(x) (Tb)*mean(x)*ones(length(x), 1));
+filtered_I = blkproc(I_recovered, [numel(t)/nk*log2(M) 1], @(x) (Tb)*mean(x)*ones(length(x), 1));
+filtered_Q = blkproc(Q_recovered, [numel(t)/nk*log2(M) 1], @(x) (Tb)*mean(x)*ones(length(x), 1));
 
 
 demodulated_I=mean(reshape(filtered_I, ceil(frs/len), []))';
@@ -668,5 +732,3 @@ grid on
 legend('simulation');
 xlabel('E0No, dB');
 ylabel('Symbol Error Rate');
-
-
